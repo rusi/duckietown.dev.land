@@ -1,0 +1,53 @@
+.headroom {
+  transition: all 0.3s linear;
+  margin: 0;
+  padding: 0;
+}
+.headroom--unfixed .navbar {
+  background-color: rgb(66, 134, 244);
+}
+
+.headroom--pinned {
+  background-color: rgb(44, 62, 80);
+}
+
+.headroom .navbar {
+  transition: all 0.3s linear;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
+.headroom .navbar li {
+  margin-bottom: 0;
+}
+
+.edge-to-edge {
+    width: 100vw;
+    margin: 0;
+    margin-left: calc(-1 * ((100vw - 100%) / 2));
+    padding: 0;
+    padding-bottom: 0.3em;
+    padding-left: calc((100vw - 100%) / 2);
+    padding-right: calc((100vw - 100%) / 2);
+}
+
+div.splash {
+    /*border-top: 3px solid rgb(66, 134, 244);*/
+    /*background-color: rgb(44, 62, 80);*/
+    background-color: rgb(66, 134, 244);
+    padding-top: 2em;
+    padding-bottom: 2em;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 4em;
+}
+
+section:nth-child(even) {
+  background-color: white;
+}
+
+section:nth-child(odd) {
+  background-color: rgb(249, 249, 249);
+  border-top: 1px solid #DDD;
+}
