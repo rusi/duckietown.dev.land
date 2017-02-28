@@ -12,16 +12,13 @@ class SiteNav extends React.Component {
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
-            <a href={prefixLink('/')}>Gatsby Template</a>
+            <a href={prefixLink('/')}>Duckietown</a>
           </Navbar.Brand>
         </Navbar.Header>
         <Nav className="navbar-right">
           <IndexLinkContainer to={prefixLink('/')}>
             <NavItem eventKey={1}><FontAwesome name="home" className={'navBarIcon'} /> Home</NavItem>
           </IndexLinkContainer>
-          <LinkContainer to={prefixLink('/sections/')}>
-            <NavItem eventKey={2}><FontAwesome name="bars" className={'navBarIcon'} /> Sections</NavItem>
-          </LinkContainer>
           <LinkContainer to={prefixLink('/about/')}>
             <NavItem eventKey={3}><FontAwesome name="question" className={'navBarIcon'} /> About</NavItem>
           </LinkContainer>

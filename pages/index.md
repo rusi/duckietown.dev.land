@@ -1,24 +1,33 @@
 ---
-title: Welcome to Gatsby
+title: Welcome
 ---
 
-This is a minimal Gatsby site.
+<div class="edge-to-edge splash">
 
-```
-gatsby develop
-```
+Welcome to Duckietown
 
-HTML:
+</div>
 
-```html
-    <h1>HTML code</h1>
-    <p class="some">This is an example</p>
-```
+<section>
 
-Python:
+## Section A
 
-```python
-    def func():
-      for i in [1, 2, 3]:
-        print "%s" % i
-```
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec imperdiet tincidunt dui et eleifend. Aenean et turpis ultricies, fermentum tellus quis, tristique orci. Nunc dui eros, vulputate in mi quis, imperdiet lobortis urna. Integer metus diam, suscipit id augue et, pellentesque tincidunt neque.
+
+</section>
+
+<section class="edge-to-edge">
+
+## Section B
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec imperdiet tincidunt dui et eleifend. Aenean et turpis ultricies, fermentum tellus quis, tristique orci. Nunc dui eros, vulputate in mi quis, imperdiet lobortis urna. Integer metus diam, suscipit id augue et, pellentesque tincidunt neque.
+
+</section>
+
+<section>
+
+## Section C
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec imperdiet tincidunt dui et eleifend. Aenean et turpis ultricies, fermentum tellus quis, tristique orci. Nunc dui eros, vulputate in mi quis, imperdiet lobortis urna. Integer metus diam, suscipit id augue et, pellentesque tincidunt neque.
+
+</section>

@@ -1,0 +1,29 @@
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+body {
+  position: relative;
+  min-height: 100%;
+  padding-bottom: 14rem;
+}
+footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1rem;
+
+  font-size: 0.7em;
+  background-color: #EEE;
+  text-align: center;
+}
+
+.license {
+    text-align: center;
+}

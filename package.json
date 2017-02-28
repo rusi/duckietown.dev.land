@@ -1,7 +1,7 @@
 {
-  "name": "gatsby-starter-site",
+  "name": "duckietown-website",
   "version": "0.1.0",
-  "description": "Minimalistic Gatsby Starter Template",
+  "description": "Duckietown Website",
   "main": "n/a",
   "license": "MIT",
   "author": "rusi@me.com",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rusi/gatsby-starter-site.git"
+    "url": "git+https://github.com/rusi/duckietown.dev.land.git"
   },
   "dependencies": {
     "gatsby": "^0.12.36",
@@ -32,12 +32,13 @@
   "devDependencies": {
     "eslint": "^3.16.1",
     "eslint-config-airbnb": "^14.1.0",
+    "eslint-config-google": "^0.7.1",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.0"
   },
   "bugs": {
-    "url": "https://github.com/rusi/gatsby-starter-site/issues"
+    "url": "https://github.com/rusi/duckietown.dev.land/issues"
   },
-  "homepage": "https://github.com/rusi/gatsby-starter-site#readme"
+  "homepage": "https://github.com/rusi/duckietown.dev.land#readme"
 }

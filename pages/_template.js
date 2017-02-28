@@ -3,6 +3,7 @@ import { Container } from 'react-responsive-grid'
 import { rhythm } from '../utils/typography'
 
 import SiteNav from '../components/SiteNav'
+import StickyFooter from '../components/StickyFooter'
 
 import '../css/main.css'
 
@@ -19,6 +20,7 @@ function template (props) {
       >
         {props.children}
       </Container>
+      <StickyFooter/>
     </div>
   )
 }

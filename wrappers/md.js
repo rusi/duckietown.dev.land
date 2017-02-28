@@ -11,16 +11,11 @@ module.exports = React.createClass({
   },
   render () {
     const post = this.props.route.page.data
-    let titleElement = "";
-    if (post.title) {
-      titleElement = <h1>{post.title}</h1>
-    }
     return (
       <div className="markdown">
         <Helmet
           title={`${config.siteTitle} | ${post.title}`}
         />
-        {titleElement}
         <div dangerouslySetInnerHTML={{ __html: post.body }} />
       </div>
     )
