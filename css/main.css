@@ -21,6 +21,10 @@
   margin-bottom: 0;
 }
 
+.love {
+  color: #E00000;
+}
+
 .edge-to-edge {
     width: 100vw;
     margin: 0;
