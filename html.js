@@ -27,7 +27,7 @@ function HTML (props) {
         <TypographyStyle typography={typography} />
         <GoogleFont typography={typography} />
         {css}
-        <link rel="stylesheet" href="https://bootswatch.com/flatly/bootstrap.min.css"/>
+        {/*<link rel="stylesheet" href="https://bootswatch.com/flatly/bootstrap.min.css"/>*/}
         {/*<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css"/>*/}
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
         {head.title.toComponent()}
