@@ -35,12 +35,37 @@
     padding-right: calc((100vw - 100%) / 2);
 }
 
+div.polaroid {
+  position: relative;
+}
+div.polaroid img {
+  /*border: 1px solid #999;*/
+  width: 50%;
+  border: 10px solid #FFF;
+  border-bottom: 80px solid #fff;
+  -webkit-box-shadow: 8px 8px 10px #444;
+     -moz-box-shadow: 8px 8px 10px #444;
+          box-shadow: 8px 8px 10px #444;
+  padding: 4px;
+  background-color: #333;
+  /*border-radius: 10px;*/
+}
+div.polaroid p.title {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  bottom: 0px;
+  /*font-size: 18px;*/
+  font: 400 36px 'Kaushan Script', cursive;
+  color: #333;
+}
+
 div.splash {
     /*border-top: 3px solid rgb(66, 134, 244);*/
     /*background-color: rgb(44, 62, 80);*/
     background-color: rgb(66, 134, 244);
-    padding-top: 2em;
-    padding-bottom: 2em;
+    padding-top: 1em;
+    padding-bottom: 1em;
     text-align: center;
     color: white;
     font-weight: bold;
