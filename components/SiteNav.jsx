@@ -23,7 +23,7 @@ class SiteNav extends React.Component {
       activeBuild = "active"
     }
     let activeLearn=""
-    if (router.isActive('/learn/basics', false) ||
+    if (router.isActive('/learn/getting_started', false) ||
       router.isActive('/learn/blockly', false)) {
       activeLearn = "active"
     }
@@ -57,14 +57,12 @@ class SiteNav extends React.Component {
           </NavDropdown>
 
           <NavDropdown eventKey={3} title={learnTitle} id="nav-dropdown" className={activeLearn}>
-            <LinkContainer to={prefixLink('/learn/basics/')}>
+            <LinkContainer to={prefixLink('/learn/getting_started/')}>
               <MenuItem eventKey={3.1}>Getting Started</MenuItem>
             </LinkContainer>
             <LinkContainer to={prefixLink('/learn/blockly/')}>
               <MenuItem eventKey={3.2}>Blockly</MenuItem>
             </LinkContainer>
-            <MenuItem divider />
-            <MenuItem eventKey={3.3}>Extras</MenuItem>
           </NavDropdown>
 
           <NavDropdown eventKey={4} title={exploreTitle} id="nav-dropdown" className={activeExplore}>

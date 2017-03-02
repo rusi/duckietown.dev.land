@@ -1,2 +1,7 @@
-@import 'bootstrap/bootstrap';
+// NOTE: order matters:
+//   import mixins first because they are used by bootstrap-flatly
+//   bootstrap has to be imported last because bootstrap-flatly defines all variables...
+
+@import 'bootstrap/bootstrap/mixins';
 @import 'bootstrap-flatly/bootstrap-flatly';
+@import 'bootstrap/bootstrap';
