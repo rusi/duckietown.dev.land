@@ -12,3 +12,8 @@ The class focuses on solving the ultimate problem to
 
 This project ([duckietown.dev.land](http://duckietown.dev.land)) is an attempt to extend
 the **City of Duckietown** and open its doors to Middle School students.
+
+## Sources
+
+* The source code for this website is avaialble on Github:
+  https://github.com/rusi/duckietown.dev.land

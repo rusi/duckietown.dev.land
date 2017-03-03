@@ -15,6 +15,7 @@ function template (props) {
     <div>
       <SiteNav/>
       <Container
+        className="content-body"
         style={{
           maxWidth: 700,
           padding: `${rhythm(1)} ${rhythm(3/4)}`,

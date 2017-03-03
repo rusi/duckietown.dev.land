@@ -11,13 +11,13 @@
   background-color: rgb(44, 62, 80);
 }
 
-.headroom .navbar {
+header.navbar {
   transition: all 0.3s linear;
   margin-bottom: 0;
   border-radius: 0;
 }
 
-.headroom .navbar li {
+header.navbar li {
   margin-bottom: 0;
 }
 
@@ -40,7 +40,7 @@ div.polaroid {
 }
 div.polaroid img {
   /*border: 1px solid #999;*/
-  width: 50%;
+  width: 90vw;
   border: 10px solid #FFF;
   border-bottom: 80px solid #fff;
   -webkit-box-shadow: 8px 8px 10px #444;
@@ -57,6 +57,7 @@ div.polaroid p.title {
   bottom: 0px;
   /*font-size: 18px;*/
   font: 400 36px 'Kaushan Script', cursive;
+  font-size: calc(0.5em + 1vw);
   color: #333;
 }
 
@@ -79,4 +80,33 @@ section:nth-child(even) {
 section:nth-child(odd) {
   background-color: rgb(249, 249, 249);
   border-top: 1px solid #DDD;
+
+    width: 100vw;
+    margin: 0;
+    margin-left: calc(-1 * ((100vw - 100%) / 2));
+    padding: 0;
+    padding-bottom: 0.3em;
+    padding-left: calc((100vw - 100%) / 2);
+    padding-right: calc((100vw - 100%) / 2);
+}
+
+@media screen and (max-width: 800px) {
+  div.splash {
+    font-size: 6.5vw;
+  }
+  .duckie {
+    width: 16vw;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  h1.title {
+    font-size: 7.5vw;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  h1.title {
+    font-size: 1.6em;
+  }
 }

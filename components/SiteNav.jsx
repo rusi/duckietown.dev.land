@@ -23,7 +23,8 @@ class SiteNav extends React.Component {
       activeBuild = "active"
     }
     let activeLearn=""
-    if (router.isActive('/learn/getting_started', false) ||
+    if (router.isActive('/learn/rules', false) ||
+      router.isActive('/learn/getting_started', false) ||
       router.isActive('/learn/blockly', false)) {
       activeLearn = "active"
     }
@@ -33,50 +34,61 @@ class SiteNav extends React.Component {
     }
 
     return (
-      <Headroom>
-      <Navbar>
+      // <Headroom>
+      <Navbar
+        collapseOnSelect
+        componentClass="header"
+        role="banner"
+      >
         <Navbar.Header>
           <Navbar.Brand>
             <a href={prefixLink('/')}>Duckietown</a>
           </Navbar.Brand>
+          <Navbar.Toggle/>
         </Navbar.Header>
-        <Nav className="navbar-right">
-          <IndexLinkContainer to={prefixLink('/')}>
-            <NavItem eventKey={1}><FontAwesome name="home" className={'navBarIcon'} /> Home</NavItem>
-          </IndexLinkContainer>
+        <Navbar.Collapse>
+          <Nav className="navbar-right">
+            <IndexLinkContainer to={prefixLink('/')}>
+              <NavItem eventKey={1}><FontAwesome name="home" className={'navBarIcon'} /> Home</NavItem>
+            </IndexLinkContainer>
 
-          <NavDropdown eventKey={2} title={buildTitle} id="nav-dropdown" className={activeBuild}>
-            <LinkContainer to={prefixLink('/build/duckietown/')}>
-              <MenuItem eventKey={2.1}>DuckieTown</MenuItem>
-            </LinkContainer>
-            <LinkContainer to={prefixLink('/build/duckiebot/')}>
-              <MenuItem eventKey={2.2}>DuckieBot</MenuItem>
-            </LinkContainer>
-            <MenuItem divider />
-            <MenuItem eventKey={2.3}>Software</MenuItem>
-          </NavDropdown>
+            <NavDropdown eventKey={2} title={buildTitle} id="nav-dropdown" className={activeBuild}>
+              <LinkContainer to={prefixLink('/build/duckietown/')}>
+                <MenuItem eventKey={2.1}>DuckieTown</MenuItem>
+              </LinkContainer>
+              <LinkContainer to={prefixLink('/build/duckiebot/')}>
+                <MenuItem eventKey={2.2}>DuckieBot</MenuItem>
+              </LinkContainer>
+              <MenuItem divider />
+              <MenuItem eventKey={2.3}>Software</MenuItem>
+            </NavDropdown>
 
-          <NavDropdown eventKey={3} title={learnTitle} id="nav-dropdown" className={activeLearn}>
-            <LinkContainer to={prefixLink('/learn/getting_started/')}>
-              <MenuItem eventKey={3.1}>Getting Started</MenuItem>
-            </LinkContainer>
-            <LinkContainer to={prefixLink('/learn/blockly/')}>
-              <MenuItem eventKey={3.2}>Blockly</MenuItem>
-            </LinkContainer>
-          </NavDropdown>
+            <NavDropdown eventKey={3} title={learnTitle} id="nav-dropdown" className={activeLearn}>
+              <LinkContainer to={prefixLink('/learn/rules/')}>
+                <MenuItem eventKey={3.1}>Rules & Regulations</MenuItem>
+              </LinkContainer>
+              <MenuItem divider />
+              <LinkContainer to={prefixLink('/learn/getting_started/')}>
+                <MenuItem eventKey={3.2}>Getting Started</MenuItem>
+              </LinkContainer>
+              <LinkContainer to={prefixLink('/learn/blockly/')}>
+                <MenuItem eventKey={3.3}>Blockly</MenuItem>
+              </LinkContainer>
+            </NavDropdown>
 
-          <NavDropdown eventKey={4} title={exploreTitle} id="nav-dropdown" className={activeExplore}>
-            <LinkContainer to={prefixLink('/explore/advanced/')}>
-              <MenuItem eventKey={4.1}>Advanced Topics</MenuItem>
-            </LinkContainer>
-          </NavDropdown>
+            <NavDropdown eventKey={4} title={exploreTitle} id="nav-dropdown" className={activeExplore}>
+              <LinkContainer to={prefixLink('/explore/advanced/')}>
+                <MenuItem eventKey={4.1}>Advanced Topics</MenuItem>
+              </LinkContainer>
+            </NavDropdown>
 
-          <LinkContainer to={prefixLink('/about/')}>
-            <NavItem eventKey={5}><FontAwesome name="question" className={'navBarIcon'} /> About</NavItem>
-          </LinkContainer>
-        </Nav>
+            <LinkContainer to={prefixLink('/about/')}>
+              <NavItem eventKey={5}><FontAwesome name="question" className={'navBarIcon'} /> About</NavItem>
+            </LinkContainer>
+          </Nav>
+        </Navbar.Collapse>
       </Navbar>
-      </Headroom>
+      // </Headroom>
     )
   }
 }
