@@ -3,8 +3,15 @@
   margin: 0;
   padding: 0;
 }
-.headroom--unfixed .navbar {
+.headroom--unfixed .navbar,
+header.splash {
   background-color: rgb(66, 134, 244);
+  border: 0px;
+}
+header.splash .navbar-nav > .active > a,
+header.splash .navbar-nav > .active > a:hover,
+header.splash .navbar-nav > .active > a:focus {
+  background-color: rgb(45, 95, 180);
 }
 
 .headroom--pinned {

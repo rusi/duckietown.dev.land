@@ -33,11 +33,17 @@ class SiteNav extends React.Component {
       activeExplore = "active"
     }
 
+    let navStyle = ""
+    if (router.isActive('/', true)) {
+      navStyle = "splash"
+    }
+
     return (
       // <Headroom>
       <Navbar
         collapseOnSelect
         componentClass="header"
+        className={navStyle}
         role="banner"
       >
         <Navbar.Header>
