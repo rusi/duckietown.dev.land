@@ -133,22 +133,26 @@ section.step:nth-child(odd) img {
     font-size: 7.5vw;
   }
 
-  /*section.step h2 {
-    margin-left: 0;
+  section.step:nth-child(even) img {
+    float: none;
+    padding-right: 12px;
   }
-  div.img-left, div.img-right {
-    margin-left: 0;
-  }*/
+  section.step:nth-child(odd) img {
+    float: none;
+    padding-left: 12px;
+  }
 }
 
 @media screen and (max-width: 400px) {
   h1.title {
     font-size: 1.6em;
   }
-  /*section.step h2 {
-    margin-left: 0;
+  section.step:nth-child(even) img {
+    float: none;
+    padding-right: 12px;
   }
-  div.img-left, div.img-right {
-    margin-left: 0;
-  }*/
+  section.step:nth-child(odd) img {
+    float: none;
+    padding-left: 12px;
+  }
 }
