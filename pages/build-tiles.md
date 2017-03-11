@@ -14,18 +14,8 @@ Duckietown has two layers - Tiles and Signs:
 * **Tiles**: The first layer is the floor layer. The floor is built of interconnected exercise mats with tape on them. 
 * **Signes**: The second layer is signs and other objects that sit on top of the mats. 
 * **NOTE**: In the case that Duckietown directly abuts a wall, a perimeter of vertical tiles should be added to reduce visual clutter and false positives.
-
-</section>
-
-<section>
-
-# Buidling the Tiles
-
-Each tile is a 2ft x 2ft interlock square. There are four types of tiles:
-* ![two lane](/images/tile-two-lane-small.jpg) **Two lane straight** tile
-* ![curved](/images/tile-two-lane-90-small.jpg) **Curved 90deg** tile
-* **Three way intersection** tile
-* **Four way intersection** tile
+* **NOTE**: The edge of each tile with a white piece of tape should also have a small curb (use the edge pieces that come with the mats for this). The purpose of this is to clearly delineate the white lanes and make lanes in adjacent roads less visible from the onboard camera. 
+Moreover, the Duckiebot is not powerful enough to cross the curb, so the failure of one car causes only the current tile to become unavailable.
 
 </section>
 
@@ -54,15 +44,31 @@ Additional Items:
 
 </section>
 
+<section>
+
+# Buidling the Tiles
+
+Each tile is a 2ft x 2ft interlock square. There are ~~four~~ **two** types of tiles:
+* ![two lane](/images/tile-two-lane-small.jpg) **Two lane straight** tile
+* ![curved](/images/tile-two-lane-90-small.jpg) **Curved 90°** tile
+* ~~Three way intersection tile~~
+* ~~Four way intersection tile~~
+
+</section>
+
 <section class="step">
 
 ## Making Two Lane Straight Tile
 
 [![two lane straight](/images/tile-two-lane.jpg)](/images/tile-two-lane.jpg)
 
-Use the white 1.88" (5cm) Duck Tape to create the outer lane borders. It is assumed that the **white strip is always on the right** side of the lane. Also, **the white strip is always solid**.
+Use the white 1.88" (5cm) Duck Tape to create the outer borders. It is assumed that the **white strip is always on the right** side of the lane. Also, **the white strip is always solid**.
 
-**NOTE** that the while strip is **2cm** away from the inner edge of the interlocking tile.
+**NOTE** that the white strip is **2cm** away from the inner edge of the interlocking tile.
+
+Cut **ten 3cm** long pieces of yellow tape to create the median line. Place the pieces **3cm apart** from each other in the middle of the tile as shows in the picture.
+
+**NOTE** that the edge-to-edge distance between the medial line and the white line is **20.5cm**.
 
 </section>
 
@@ -70,40 +76,51 @@ Use the white 1.88" (5cm) Duck Tape to create the outer lane borders. It is assu
 
 ## Making Two Lane 90° Curved Tile
 
-[![two lane straight](/images/tile-two-lane.jpg)](/images/tile-two-lane.jpg)
+[![step 1 - inner border](/images/tile-90-step1.jpg)](/images/tile-90-step1.jpg)
 
-### Step 1
+### Step 1 - Inner Border
 
-Use the white 1.88" (5cm) Duck Tape to create the outer lane borders. It is assumed that the **white strip is always on the right** side of the lane. Also, **the white strip is always solid**.
-
-**NOTE** that the while strip is **2cm** away from the inner edge of the interlocking tile.
+Cut **two 7cm** pieces of white 1.88" (5cm) Duck Tape to create the inner border. Tape each piece at **2cm** away from the inner edge of the interlocking tile as shown in the picture.
 
 </section>
 
 <section class="step">
 
-[![two lane straight](/images/tile-two-lane.jpg)](/images/tile-two-lane.jpg)
+[![step 2 - inner border](/images/tile-90-step2.jpg)](/images/tile-90-step2.jpg)
 
-### Step 2
+### Step 2 - Inner Border
 
-Use the white 1.88" (5cm) Duck Tape to create the outer lane borders. It is assumed that the **white strip is always on the right** side of the lane. Also, **the white strip is always solid**.
-
-**NOTE** that the while strip is **2cm** away from the inner edge of the interlocking tile.
+Mark **3cm** away from the edge of the white border tape as shown in the picture and draw a line connecting the two marks. Use scissors or a sharp knife to cut the border and form the border line.
 
 </section>
 
 <section class="step">
 
-<div class="img-right">
+[![step 3 - outer border](/images/tile-90-step3.jpg)](/images/tile-90-step3.jpg)
 
-[![two lane straight](/images/tile-two-lane.jpg)](/images/tile-two-lane.jpg)
+### Step 3 - Outer Border
 
-</div>
+Cut **two 14cm** pieces, **two 20cm** pieces, and **one 24cm** piece of white 1.88" (5cm) Duck Tape to create the outer borders. Place the tape pieces as shown in the picture. 
 
-### Step 3
+**NOTE** that the one corner of each piece overlaps with the adjacent pieces, however, the other corner is just touching. Also note that the **14cm pieces are 2cm away** from the inner edge of the interlocking tile. Finally, the inside side of the **20cm pieces is at 10cm away** from the inner edge of the tile.
 
-Use the white 1.88" (5cm) Duck Tape to create the outer lane borders. It is assumed that the **white strip is always on the right** side of the lane. Also, **the white strip is always solid**.
+</section>
 
-**NOTE** that the while strip is **2cm** away from the inner edge of the interlocking tile.
+<section class="step">
+
+[![step 4 - center](/images/tile-90-final.jpg)](/images/tile-90-final.jpg)
+
+### Step 4 - Center line
+
+The center line is made of **three 5cm strips** of **yellow tape** and **two 3cm** strips. The center line is at **20.5cm away** from each of the edges of the inner and outer white lines. Place the yellow strips according to the image.
+
+
+</section>
+
+<section>
+
+# Buidling the Signs
+
+TODO
 
 </section>
