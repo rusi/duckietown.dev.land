@@ -1,2 +1,3 @@
 siteTitle="Duckietown"
 linkPrefix = "/"
+noProductionJavascript = false

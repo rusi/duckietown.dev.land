@@ -80,6 +80,17 @@ div.splash {
     font-size: 3em;
 }
 
+section {
+  width: 100vw;
+  margin: 0;
+  margin-left: calc(-1 * ((100vw - 100%) / 2));
+  padding: 0;
+  padding-bottom: 0.3em;
+  padding-left: calc((100vw - 100%) / 2);
+  padding-right: calc((100vw - 100%) / 2);
+
+  overflow: auto;
+}
 section:nth-child(even) {
   background-color: white;
 }
@@ -87,14 +98,25 @@ section:nth-child(even) {
 section:nth-child(odd) {
   background-color: rgb(249, 249, 249);
   border-top: 1px solid #DDD;
+}
 
-    width: 100vw;
-    margin: 0;
-    margin-left: calc(-1 * ((100vw - 100%) / 2));
-    padding: 0;
-    padding-bottom: 0.3em;
-    padding-left: calc((100vw - 100%) / 2);
-    padding-right: calc((100vw - 100%) / 2);
+section.step h2, section.step > p {
+  /*margin-left: calc(-1 * (100vw - 150%) / 2);*/
+}
+
+section.step img {
+  /*margin-left: calc(-1 * (100vw - 150%) / 2);*/
+  width: 260px;
+  padding: 12px;
+  padding-top: 18px;
+}
+section.step:nth-child(even) img {
+  float: left;
+  padding-right: 24px;
+}
+section.step:nth-child(odd) img {
+  float: right;
+  padding-left: 24px;
 }
 
 @media screen and (max-width: 800px) {
@@ -110,10 +132,23 @@ section:nth-child(odd) {
   h1.title {
     font-size: 7.5vw;
   }
+
+  /*section.step h2 {
+    margin-left: 0;
+  }
+  div.img-left, div.img-right {
+    margin-left: 0;
+  }*/
 }
 
 @media screen and (max-width: 400px) {
   h1.title {
     font-size: 1.6em;
   }
+  /*section.step h2 {
+    margin-left: 0;
+  }
+  div.img-left, div.img-right {
+    margin-left: 0;
+  }*/
 }

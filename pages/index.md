@@ -3,15 +3,11 @@ title: Welcome
 ---
 
 <div class="edge-to-edge splash">
-
-Welcome to Duckietown
-
-<div class="polaroid">
-
-![duckietown](https://j.gifs.com/gJDyP6.gif)
-<p class="title"> Duckietown 1984</p>
-</div>
-
+    Welcome to Duckietown
+    <div class="polaroid">
+        <img src="https://j.gifs.com/gJDyP6.gif" alt="Duckietown"/>
+        <p class="title"> Duckietown 1984</p>
+    </div>
 </div>
 
 <section>

@@ -11,6 +11,7 @@ import '../styles/styles'
 // import '../css/bootstrap-flatly.css'
 
 function template (props) {
+  // console.log(props.route.pages)
   return (
     <div>
       <SiteNav/>
