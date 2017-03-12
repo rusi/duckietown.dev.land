@@ -110,6 +110,12 @@ section.step h2, section.step > p {
   /*margin-left: calc(-1 * (100vw - 150%) / 2);*/
 }
 
+img.photo {
+  padding: 4px;
+  margin: 10px;
+  border: 2px solid #AAA;
+}
+
 section.step img {
   /*margin-left: calc(-1 * (100vw - 150%) / 2);*/
   width: 260px;

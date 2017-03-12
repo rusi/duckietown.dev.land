@@ -58,6 +58,8 @@ Each tile is a 2ft x 2ft interlock square. There are ~~four~~ **two** types of t
 * ~~Three way intersection tile~~
 * ~~Four way intersection tile~~
 
+![simple-town](/images/simple-town.jpg)<!-- {.photo} -->
+
 </section>
 
 <section class="step">
@@ -100,7 +102,16 @@ Place the other pieces **5cm apart** from each other in the middle of the tile a
 
 ### Step 1 - Inner Border
 
-Cut **two 7cm** pieces of white 1.88" (5cm) Duck Tape to create the inner border. Tape each piece at **2cm** away from the inner edge of the interlocking tile as shown in the picture.
+Place **two 7cm** pieces of white 1.88" (5cm) Duck Tape to create the inner border. Tape each piece at **2cm** away from the inner edge of the interlocking tile as shown in the picture.
+
+Start by measuring **2cm** and **7cm** away from the inner edge of the tile. Then place the white tape and cut around the tile.
+
+[![tile-90s-step1](/images/tile-90s-step1.jpg)](/images/tile-90s-step1.jpg)<!-- {.example} -->
+[![tile-90s-step2](/images/tile-90s-step2.jpg)](/images/tile-90s-step2.jpg)<!-- {.example} -->
+[![tile-90s-step3](/images/tile-90s-step3.jpg)](/images/tile-90s-step3.jpg)<!-- {.example} -->
+<!-- {p:.center} -->
+
+Repeat to add the other side of the inner corner.
 
 </section>
 
@@ -110,7 +121,12 @@ Cut **two 7cm** pieces of white 1.88" (5cm) Duck Tape to create the inner border
 
 ### Step 2 - Inner Border
 
-Mark **3cm** away from the edge of the white border tape as shown in the picture and draw a line connecting the two marks. Use scissors or a sharp knife to cut the border and form the border line.
+Mark **3cm** away from the edge of the white border tape as shown in the picture and draw a line connecting the two marks. Note that the line connecting the two marks is **6cm**. Use scissors or a sharp knife to cut the border and form the border line.
+
+[![tile-90s-step4.1](/images/tile-90s-step4.1.jpg)](/images/tile-90s-step4.1.jpg)<!-- {.example} -->
+[![tile-90s-step4.2](/images/tile-90s-step4.2.jpg)](/images/tile-90s-step4.2.jpg)<!-- {.example} -->
+[![tile-90s-step4.3](/images/tile-90s-step4.3.jpg)](/images/tile-90s-step4.3.jpg)<!-- {.example} -->
+<!-- {p:.center} -->
 
 </section>
 
@@ -132,7 +148,7 @@ First, place the two 14cm pieces.
 [![tile-90s-step7](/images/tile-90s-step7.jpg)](/images/tile-90s-step7.jpg)<!-- {.example} -->
 <!-- {p:.center} -->
 
-Then, measure 10cm away from the edge of the tile and place the two 20cm pieces. 
+Then, at about **18cm** away from the last tape strip, measure and place a marker at **10cm** away from the inner edge of the tile. Measure **20cm** white tape strip and place it connecting the outer edge of the last tape strip to the **10cm** mark that you just placed.
 
 **NOTE** that the one corner of each piece overlaps with the adjacent pieces, however, the other corner is just touching. 
 <!-- {p:.alert .alert-warning} -->
@@ -142,7 +158,9 @@ Then, measure 10cm away from the edge of the tile and place the two 20cm pieces.
 [![tile-90s-step12](/images/tile-90s-step12.jpg)](/images/tile-90s-step12.jpg)<!-- {.example} -->
 <!-- {p:.center} -->
 
-Finally, connect the edges of the 20cm strips with the 22cm strip.
+Repeat on the other side to add the **second 20cm strip**.
+
+Finally, connect the edges of the 20cm strips with the **22cm strip**.
 
 [![tile-90s-step13](/images/tile-90s-step13.jpg)](/images/tile-90s-step13.jpg)<!-- {.example} -->
 [![tile-90s-step14](/images/tile-90s-step14.jpg)](/images/tile-90s-step14.jpg)<!-- {.example} -->
