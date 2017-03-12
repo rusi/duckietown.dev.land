@@ -80,6 +80,11 @@ div.splash {
     font-size: 3em;
 }
 
+.center {
+  text-align: center;
+  overflow: auto;
+}
+
 section {
   width: 100vw;
   margin: 0;
@@ -90,6 +95,7 @@ section {
   padding-right: calc((100vw - 100%) / 2);
 
   overflow: auto;
+  clear: both;
 }
 section:nth-child(even) {
   background-color: white;
@@ -117,6 +123,20 @@ section.step:nth-child(even) img {
 section.step:nth-child(odd) img {
   float: right;
   padding-left: 24px;
+}
+
+section.step img.example {
+  float: none;
+  padding: 4px;
+  margin: 10px;
+  border: 2px solid #AAA;
+  width: 200px;
+  height: auto;
+}
+
+section.step img.img-h {
+  height: 200px;
+  width: auto;
 }
 
 @media screen and (max-width: 800px) {

@@ -13,9 +13,13 @@ when Duckies travel from one town to another, every town should follow these rul
 Duckietown has two layers - Tiles and Signs:
 * **Tiles**: The first layer is the floor layer. The floor is built of interconnected exercise mats with tape on them. 
 * **Signes**: The second layer is signs and other objects that sit on top of the mats. 
-* **NOTE**: In the case that Duckietown directly abuts a wall, a perimeter of vertical tiles should be added to reduce visual clutter and false positives.
-* **NOTE**: The edge of each tile with a white piece of tape should also have a small curb (use the edge pieces that come with the mats for this). The purpose of this is to clearly delineate the white lanes and make lanes in adjacent roads less visible from the onboard camera. 
+
+**NOTE**: In the case that Duckietown directly abuts a wall, a perimeter of vertical tiles should be added to reduce visual clutter and false positives.
+<!-- {p:.alert .alert-warning} -->
+
+**NOTE**: The edge of each tile with a white piece of tape should also have a small curb (use the edge pieces that come with the mats for this). The purpose of this is to clearly delineate the white lanes and make lanes in adjacent roads less visible from the onboard camera. 
 Moreover, the Duckiebot is not powerful enough to cross the curb, so the failure of one car causes only the current tile to become unavailable.
+<!-- {p:.alert .alert-warning} -->
 
 </section>
 
@@ -23,7 +27,7 @@ Moreover, the Duckiebot is not powerful enough to cross the curb, so the failure
 
 ## Materials
 
-Following is a list of materials required to build the tiles:
+Following is a list of materials required to build the tiles (~$140):
 
 * <a target="_blank"  href="https://www.amazon.com/gp/product/B01IDRWPG8/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01IDRWPG8&linkCode=as2&tag=duckietown-20&linkId=bb91b7d582c9da6c00d76d6a6a57df6d"><img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN=B01IDRWPG8&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=duckietown-20" width="40" /> Foam Interlocking Tiles (2ft x 2ft) (B01IDRWPG8)</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=duckietown-20&l=am2&o=1&a=B01IDRWPG8" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
@@ -34,7 +38,7 @@ Following is a list of materials required to build the tiles:
 * <a target="_blank"  href="https://www.amazon.com/gp/product/B000BQWLF0/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B000BQWLF0&linkCode=as2&tag=duckietown-20&linkId=6305eea6f8afaff8d89218b04fe76edc"><img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN=B000BQWLF0&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=duckietown-20" width="40" /> Yellow Electrical Tape, 3/4-Inch (B000BQWLF0)</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=duckietown-20&l=am2&o=1&a=B000BQWLF0" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
 ---
-Additional Items:
+Additional Items (~$45):
 
 * <a target="_blank"  href="https://www.amazon.com/gp/product/B00YMRZNTA/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B00YMRZNTA&linkCode=as2&tag=duckietown-20&linkId=d7652215f74b7115d07953317ba850d6"><img border="0" src="http://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN=B00YMRZNTA&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=duckietown-20" width="40" /> Rubber Duckies (B00YMRZNTA)</a><img src="http://ir-na.amazon-adsystem.com/e/ir?t=duckietown-20&l=am2&o=1&a=B00YMRZNTA" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
@@ -64,11 +68,27 @@ Each tile is a 2ft x 2ft interlock square. There are ~~four~~ **two** types of t
 
 Use the white 1.88" (5cm) Duck Tape to create the outer borders. It is assumed that the **white strip is always on the right** side of the lane. Also, **the white strip is always solid**.
 
-**NOTE** that the white strip is **2cm** away from the inner edge of the interlocking tile.
+Start by placing markers at **2cm away from the inner edge** of the interlocking tile. Then place the white tape from one side of the tile to the other, covering the interlocking pieces.
 
-Cut **ten 3cm** long pieces of yellow tape to create the median line. Place the pieces **3cm apart** from each other in the middle of the tile as shows in the picture.
+**TIP**: Use two small pieces of tape to measure and mark the locations where the tape should be placed, as shown in the pictures below.
+<!-- {p:.alert .alert-info} -->
 
-**NOTE** that the edge-to-edge distance between the medial line and the white line is **20.5cm**.
+[![tile-s-step1](/images/tile-s-step1.jpg)](/images/tile-s-step1.jpg)<!-- {.example} -->
+[![tile-s-step2](/images/tile-s-step2.jpg)](/images/tile-s-step2.jpg)<!-- {.example .img-h} -->
+<!-- {p:.center} -->
+
+Cut **six 5cm** long pieces of yellow tape to create the median line. Place the first one **3cm** away from the inner edge of the tile and at **21cm** from the edge of the white line. The edge-to-edge distance between the medial line and the white line should be **21cm**.
+
+[![tile-s-step5](/images/tile-s-step5.jpg)](/images/tile-s-step5.jpg)<!-- {.example .img-h} -->
+[![tile-s-step6](/images/tile-s-step6.jpg)](/images/tile-s-step6.jpg)<!-- {.example .img-h} -->
+<!-- {p:.center} -->
+
+Place the other pieces **5cm apart** from each other in the middle of the tile as shows in the pictures.
+
+[![tile-s-step7](/images/tile-s-step7.jpg)](/images/tile-s-step7.jpg)<!-- {.example} -->
+[![tile-s-step8](/images/tile-s-step8.jpg)](/images/tile-s-step8.jpg)<!-- {.example} -->
+[![tile-s-step9](/images/tile-s-step9.jpg)](/images/tile-s-step9.jpg)<!-- {.example} -->
+<!-- {p:.center} -->
 
 </section>
 
@@ -100,9 +120,34 @@ Mark **3cm** away from the edge of the white border tape as shown in the picture
 
 ### Step 3 - Outer Border
 
-Cut **two 14cm** pieces, **two 20cm** pieces, and **one 24cm** piece of white 1.88" (5cm) Duck Tape to create the outer borders. Place the tape pieces as shown in the picture. 
+Cut **two 14cm** pieces, **two 20cm** pieces, and **one 22cm** piece of white 1.88" (5cm) Duck Tape to create the outer borders. Place the tape pieces as shown in the picture.
 
-**NOTE** that the one corner of each piece overlaps with the adjacent pieces, however, the other corner is just touching. Also note that the **14cm pieces are 2cm away** from the inner edge of the interlocking tile. Finally, the inside side of the **20cm pieces is at 10cm away** from the inner edge of the tile.
+First, place the two 14cm pieces. 
+
+**NOTE** that the **14cm pieces are 2cm away** from the inner edge of the interlocking tile. 
+<!-- {p:.alert .alert-warning} -->
+
+[![tile-90s-step5](/images/tile-90s-step5.jpg)](/images/tile-90s-step5.jpg)<!-- {.example} -->
+[![tile-90s-step6](/images/tile-90s-step6.jpg)](/images/tile-90s-step6.jpg)<!-- {.example} -->
+[![tile-90s-step7](/images/tile-90s-step7.jpg)](/images/tile-90s-step7.jpg)<!-- {.example} -->
+<!-- {p:.center} -->
+
+Then, measure 10cm away from the edge of the tile and place the two 20cm pieces. 
+
+**NOTE** that the one corner of each piece overlaps with the adjacent pieces, however, the other corner is just touching. 
+<!-- {p:.alert .alert-warning} -->
+
+[![tile-90s-step10](/images/tile-90s-step10.jpg)](/images/tile-90s-step10.jpg)<!-- {.example} -->
+[![tile-90s-step11](/images/tile-90s-step11.jpg)](/images/tile-90s-step11.jpg)<!-- {.example} -->
+[![tile-90s-step12](/images/tile-90s-step12.jpg)](/images/tile-90s-step12.jpg)<!-- {.example} -->
+<!-- {p:.center} -->
+
+Finally, connect the edges of the 20cm strips with the 22cm strip.
+
+[![tile-90s-step13](/images/tile-90s-step13.jpg)](/images/tile-90s-step13.jpg)<!-- {.example} -->
+[![tile-90s-step14](/images/tile-90s-step14.jpg)](/images/tile-90s-step14.jpg)<!-- {.example} -->
+[![tile-90s-step15](/images/tile-90s-step15.jpg)](/images/tile-90s-step15.jpg)<!-- {.example} -->
+<!-- {p:.center} -->
 
 </section>
 
@@ -112,8 +157,14 @@ Cut **two 14cm** pieces, **two 20cm** pieces, and **one 24cm** piece of white 1.
 
 ### Step 4 - Center line
 
-The center line is made of **three 5cm strips** of **yellow tape** and **two 3cm** strips. The center line is at **20.5cm away** from each of the edges of the inner and outer white lines. Place the yellow strips according to the image.
+The center line is made of **five 5cm strips** of **yellow tape**. The center line is at **21cm away** from each of the edges of the inner and outer white lines. Place the yellow strips according to the image.
 
+Start by placing the middle strip. Then place the edge strips, and finally place the last strips so that they are all equally spaced.
+
+[![tile-90s-step18](/images/tile-90s-step18.jpg)](/images/tile-90s-step18.jpg)<!-- {.example} -->
+[![tile-90s-step19](/images/tile-90s-step19.jpg)](/images/tile-90s-step19.jpg)<!-- {.example} -->
+[![tile-90s-step20](/images/tile-90s-step20.jpg)](/images/tile-90s-step20.jpg)<!-- {.example} -->
+<!-- {p:.center} -->
 
 </section>
 
