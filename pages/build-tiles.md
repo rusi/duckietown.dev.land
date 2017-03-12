@@ -136,7 +136,7 @@ Mark **3cm** away from the edge of the white border tape as shown in the picture
 
 ### Step 3 - Outer Border
 
-Cut **two 14cm** pieces, **two 20cm** pieces, and **one 22cm** piece of white 1.88" (5cm) Duck Tape to create the outer borders. Place the tape pieces as shown in the picture.
+Place **two 14cm** pieces, **two 20cm** pieces, and **one 22cm** piece of white 1.88" (5cm) Duck Tape to create the outer borders. Place the tape pieces as shown in the picture.
 
 First, place the two 14cm pieces. 
 

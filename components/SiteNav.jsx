@@ -65,11 +65,11 @@ class SiteNav extends React.Component {
               <LinkContainer to={prefixLink('/build/duckiebot/')}>
                 <MenuItem eventKey={2.2}>DuckieBot</MenuItem>
               </LinkContainer>
-              <MenuItem divider />
-              <MenuItem eventKey={2.3}>Software</MenuItem>
+              {/*<MenuItem divider />
+              <MenuItem eventKey={2.3}>Software</MenuItem>*/}
             </NavDropdown>
 
-            <NavDropdown eventKey={3} title={learnTitle} id="nav-dropdown" className={activeLearn}>
+            {/*<NavDropdown eventKey={3} title={learnTitle} id="nav-dropdown" className={activeLearn}>
               <LinkContainer to={prefixLink('/learn/rules/')}>
                 <MenuItem eventKey={3.1}>Rules & Regulations</MenuItem>
               </LinkContainer>
@@ -80,13 +80,13 @@ class SiteNav extends React.Component {
               <LinkContainer to={prefixLink('/learn/blockly/')}>
                 <MenuItem eventKey={3.3}>Blockly</MenuItem>
               </LinkContainer>
-            </NavDropdown>
+            </NavDropdown>*/}
 
-            <NavDropdown eventKey={4} title={exploreTitle} id="nav-dropdown" className={activeExplore}>
+            {/*<NavDropdown eventKey={4} title={exploreTitle} id="nav-dropdown" className={activeExplore}>
               <LinkContainer to={prefixLink('/explore/advanced/')}>
                 <MenuItem eventKey={4.1}>Advanced Topics</MenuItem>
               </LinkContainer>
-            </NavDropdown>
+            </NavDropdown>*/}
 
             <LinkContainer to={prefixLink('/about/')}>
               <NavItem eventKey={5}><FontAwesome name="question" className={'navBarIcon'} /> About</NavItem>
