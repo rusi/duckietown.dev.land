@@ -31,6 +31,10 @@ var md = markdownIt({
   .use(require('markdown-it-abbr'))
   // .use(require('markdown-it-attrs'))
   .use(require('markdown-it-decorate'))
+  .use(require('markdown-it-link-attributes'), {
+      target: '_blank',
+      rel: 'noopener noreferrer'
+    })
 
 module.exports = function (content) {
   this.cacheable()

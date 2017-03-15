@@ -115,6 +115,10 @@ img.photo {
   margin: 10px;
   border: 2px solid #AAA;
 }
+img.small {
+  width: 300px;
+  margin: 0;
+}
 
 section.step img {
   /*margin-left: calc(-1 * (100vw - 150%) / 2);*/

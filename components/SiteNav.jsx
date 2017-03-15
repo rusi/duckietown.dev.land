@@ -60,10 +60,13 @@ class SiteNav extends React.Component {
 
             <NavDropdown eventKey={2} title={buildTitle} id="nav-dropdown" className={activeBuild}>
               <LinkContainer to={prefixLink('/build/duckietown/')}>
-                <MenuItem eventKey={2.1}>DuckieTown</MenuItem>
+                <MenuItem eventKey={2.1}>Build <strong>DuckieTown</strong></MenuItem>
               </LinkContainer>
               <LinkContainer to={prefixLink('/build/duckiebot/')}>
-                <MenuItem eventKey={2.2}>DuckieBot</MenuItem>
+                <MenuItem eventKey={2.2}>Assemble <strong>DuckieBot</strong></MenuItem>
+              </LinkContainer>
+              <LinkContainer to={prefixLink('/build/duckieos/')}>
+                <MenuItem eventKey={2.3}>Install <strong>DuckieOS</strong></MenuItem>
               </LinkContainer>
               {/*<MenuItem divider />
               <MenuItem eventKey={2.3}>Software</MenuItem>*/}

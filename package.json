@@ -20,6 +20,7 @@
     "markdown-it-decorate": "^1.2.2",
     "markdown-it-deflist": "^2.0.1",
     "markdown-it-footnote": "^3.0.1",
+    "markdown-it-link-attributes": "^1.0.0",
     "markdown-it-sub": "^1.0.0",
     "react": "^15.4.2",
     "react-bootstrap": "^0.30.7",

@@ -5,7 +5,7 @@ path: /build/duckiebot/
 
 <section>
 
-# Building Duckiebot
+# Assembling Duckiebot
 
 In order to move around Duckietown, you need to have a Duckiebot. Building a Duckiebot is not
 very difficult, but requires some soldering skills. Fell free to ask for help if you are having
@@ -42,8 +42,9 @@ Additional Items (~$70):
 
 * <a target="_blank"  href="https://www.amazon.com/gp/product/B0041RR0TW/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B0041RR0TW&linkCode=as2&tag=duckietown-20&linkId=cd280d9ff89e02899808e672ea695153"><img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN=B0041RR0TW&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=duckietown-20" width="40"/> Logitech Gamepad F710</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=duckietown-20&l=am2&o=1&a=B0041RR0TW" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 * <a target="_blank"  href="https://www.amazon.com/gp/product/B00NLO9JB8/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B00NLO9JB8&linkCode=as2&tag=duckietown-20&linkId=3fadaddb295cfa347aaf0b75b8bdd718"><img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN=B00NLO9JB8&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=duckietown-20" width="40"/> Quikcell Portable Speaker</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=duckietown-20&l=am2&o=1&a=B00NLO9JB8" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-* <a target="_blank"  href="https://www.amazon.com/gp/product/B0173QNVT0/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B0173QNVT0&linkCode=as2&tag=duckietown-20&linkId=5418bf458dfa62586ac0333bca14b509"><img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN=B0173QNVT0&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=duckietown-20" width="40"/> JETech 2.4G Wireless Keyboard</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=duckietown-20&l=am2&o=1&a=B0173QNVT0" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-* <a target="_blank"  href="https://www.amazon.com/gp/product/B001DHECXA/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B001DHECXA&linkCode=as2&tag=duckietown-20&linkId=ab2191630ec8754b27bd8008062cba1e"><img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN=B001DHECXA&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=duckietown-20" width="40"/> TeckNet 2.4G Nano Wireless Mouse, 5 Buttons (M002)</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=duckietown-20&l=am2&o=1&a=B001DHECXA" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+
+* ~~<a target="_blank"  href="https://www.amazon.com/gp/product/B0173QNVT0/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B0173QNVT0&linkCode=as2&tag=duckietown-20&linkId=5418bf458dfa62586ac0333bca14b509"><img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN=B0173QNVT0&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=duckietown-20" width="40"/> JETech 2.4G Wireless Keyboard</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=duckietown-20&l=am2&o=1&a=B0173QNVT0" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />~~
+* ~~<a target="_blank"  href="https://www.amazon.com/gp/product/B001DHECXA/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B001DHECXA&linkCode=as2&tag=duckietown-20&linkId=ab2191630ec8754b27bd8008062cba1e"><img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN=B001DHECXA&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=duckietown-20" width="40"/> TeckNet 2.4G Nano Wireless Mouse, 5 Buttons (M002)</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=duckietown-20&l=am2&o=1&a=B001DHECXA" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />~~
 
 </section>
 
