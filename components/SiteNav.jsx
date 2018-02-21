@@ -19,11 +19,13 @@ class SiteNav extends React.Component {
     const { router } = this.props;
     let activeBuild=""
     if (router.isActive('/build/duckiebot', false) ||
-      router.isActive('/build/duckietown', false)) {
+      router.isActive('/build/duckietown', false) ||
+      router.isActive('/build/duckieos', false)
+      ) {
       activeBuild = "active"
     }
     let activeLearn=""
-    if (router.isActive('/learn/rules', false) ||
+    if (router.isActive('/learn/ros101', false) ||
       router.isActive('/learn/getting_started', false) ||
       router.isActive('/learn/blockly', false)) {
       activeLearn = "active"
@@ -72,8 +74,11 @@ class SiteNav extends React.Component {
               <MenuItem eventKey={2.3}>Software</MenuItem>*/}
             </NavDropdown>
 
-            {/*<NavDropdown eventKey={3} title={learnTitle} id="nav-dropdown" className={activeLearn}>
-              <LinkContainer to={prefixLink('/learn/rules/')}>
+            <NavDropdown eventKey={3} title={learnTitle} id="nav-dropdown" className={activeLearn}>
+              <LinkContainer to={prefixLink('/learn/ros101/')}>
+                <MenuItem eventKey={3.1}>ROS 101</MenuItem>
+              </LinkContainer>
+              {/*<LinkContainer to={prefixLink('/learn/rules/')}>
                 <MenuItem eventKey={3.1}>Rules & Regulations</MenuItem>
               </LinkContainer>
               <MenuItem divider />
@@ -82,8 +87,8 @@ class SiteNav extends React.Component {
               </LinkContainer>
               <LinkContainer to={prefixLink('/learn/blockly/')}>
                 <MenuItem eventKey={3.3}>Blockly</MenuItem>
-              </LinkContainer>
-            </NavDropdown>*/}
+              </LinkContainer>*/}
+            </NavDropdown>
 
             {/*<NavDropdown eventKey={4} title={exploreTitle} id="nav-dropdown" className={activeExplore}>
               <LinkContainer to={prefixLink('/explore/advanced/')}>

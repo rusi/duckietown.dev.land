@@ -5,8 +5,10 @@ title: Welcome
 <div class="edge-to-edge splash">
     Welcome to Duckietown
     <div class="polaroid">
-        <img src="https://j.gifs.com/gJDyP6.gif" alt="Duckietown"/>
-        <p class="title"> Duckietown 1984</p>
+        <!-- <img src="https://j.gifs.com/gJDyP6.gif" alt="Duckietown"/> -->
+        <!-- <p class="title"> Duckietown 1984</p> -->
+        <img src="/images/signs.jpg" alt="Duckietown"/>
+        <p class="title"> Under Constrution</p>
     </div>
 </div>
 
