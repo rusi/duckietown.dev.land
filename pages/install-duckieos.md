@@ -152,7 +152,20 @@ $
 
 ```sh
 $ easy_install speedtest-cli
-$
+$ speedtest-cli
+```
+
+#### Testing Network Performance
+
+On the RPi3 run:
+```sh
+HypriotOS/armv7: duckie@duckiebot in ~
+$ docker run  -it --rm --name=iperf3-server -p 5201:5201 lispmeister/rpi-iperf3 iperf3 -s
+```
+
+On the Host run:
+```sh
+$ docker run  -it --rm networkstatic/iperf3 -c duckiebot.local -f M
 ```
 
 </section>
@@ -370,8 +383,50 @@ root@60a4dc3d914d:/#
 
 <section>
 
+### Appendix 1 - Installing Edimax AC1200 Driver
+
+Compiling the Edimax AC1200 driver on the RPi3.
+https://edimax.freshdesk.com/support/solutions/articles/14000062079-how-to-install-ew-7822ulc-adapter-on-raspberry-pi
+
+```sh
+$ sudo apt update
+$ sudo apt install build-essential linux-headers-$(uname -r)
+$ cd /usr/src/linux-headers-4.4.50-hypriotos-v7+/
+$ sudo wget https://raw.githubusercontent.com/armbian/build/next/patch/headers-debian-byteshift.patch
+$ sudo patch -p1 < headers-debian-byteshift.patch
+$ sudo make scripts
+
+$ cd
+$ git clone https://github.com/brandon-bailey/rtl8822bu.git
+$ cd rtl8822bu
+$ make
+$ sudo insmod 8822bu.ko
+$ iwconfig
+```
+
+### Appendix 2 - WiFi Interfaces
+
+```
+wlan0     IEEE 802.11bgn  ESSID:"DuckieWiFi"
+          Mode:Managed  Frequency:2.437 GHz  Access Point: XX:XX:XX:XX:XX:XX
+          Bit Rate=72.2 Mb/s   Tx-Power=31 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Power Management:on
+          Link Quality=61/70  Signal level=-49 dBm
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+wlan1     IEEE 802.11AC  ESSID:"DuckieWiFi"  Nickname:"rtl8822bu"
+          Mode:Managed  Frequency:5.18 GHz  Access Point: XX:XX:XX:XX:XX:XX
+          Bit Rate:400 Mb/s   Sensitivity:0/0
+          Retry:off   RTS thr:off   Fragment thr:off
+          Power Management:off
+          Link Quality=89/100  Signal level=54/100  Noise level=0/100
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+```
+
 ### Resources
 
-* **Step 1** and **Step 2** are based on [Getting Started with ResinOS](https://resinos.io/docs/raspberrypi3/gettingstarted/)
 
 </section>
