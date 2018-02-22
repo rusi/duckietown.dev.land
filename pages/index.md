@@ -8,7 +8,7 @@ title: Welcome
         <!-- <img src="https://j.gifs.com/gJDyP6.gif" alt="Duckietown"/> -->
         <!-- <p class="title"> Duckietown 1984</p> -->
         <img src="/images/signs.jpg" alt="Duckietown"/>
-        <p class="title"> Under Constrution</p>
+        <p class="title"> Under Construction</p>
     </div>
 </div>
 
