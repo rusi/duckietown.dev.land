@@ -8,62 +8,93 @@ if [ $(id -u) != "0" ]; then
     exec sudo "$0" "$@"
 fi
 
-HYPRIOT_LOCAL="/tmp/hypriot.img.zip"
-ETCHER_LOCAL=$(mktemp)
 ETCHER_URL="https://github.com/resin-io/etcher/releases/download/v1.4.4/etcher-cli-1.4.4-linux-x86.tar.gz"
+ETCHER_DIR="/tmp/etcher-cli"
+ETCHER_LOCAL=$(mktemp)
+
 HYPRIOT_URL="https://github.com/hypriot/image-builder-rpi/releases/download/v1.7.1/hypriotos-rpi-v1.7.1.img.zip"
-INSTALL_DIR="/tmp/etcher-cli"
+HYPRIOT_LOCAL="/tmp/hypriot.img.zip"
 
 install_etcher()
 {
-	# Download tool to burn image
-	echo "Downloading etcher-cli..."
-	wget -O ${ETCHER_LOCAL} ${ETCHER_URL}
-	echo "Downloading complete."
-
-	# Unpack archive
-	mkdir $INSTALL_DIR
-	echo "Installing etcher-cli to $INSTALL_DIR..."
-	tar fvx ${ETCHER_LOCAL} -C ${INSTALL_DIR} --strip-components=1
+    # Download tool to burn image
+    echo "Downloading etcher-cli..."
+    wget -O ${ETCHER_LOCAL} ${ETCHER_URL}
+    echo "Downloading complete."
+    
+    # Unpack archive
+    mkdir $ETCHER_DIR
+    echo "Installing etcher-cli to $ETCHER_DIR..."
+    tar fvx ${ETCHER_LOCAL} -C ${ETCHER_DIR} --strip-components=1
 }
 
 download_hypriot()
 {
-	# Download the Hypriot Image
-	echo "Downloading Hypriot image to ${HYPRIOT_LOCAL}"
-	wget -O ${HYPRIOT_LOCAL} ${HYPRIOT_URL}
-	echo "Downloading complete."
+    # Download the Hypriot Image
+    echo "Downloading Hypriot image to ${HYPRIOT_LOCAL}"
+    wget -O ${HYPRIOT_LOCAL} ${HYPRIOT_URL}
+    echo "Downloading complete."
 }
 
-if [ ! -f "$INSTALL_DIR/etcher" ]; then
+flash_hypriot()
+{
+    echo "Flashing Hypriot image $HYPRIOT_LOCAL to disk..."
+    ${ETCHER_DIR}/etcher ${HYPRIOT_LOCAL}
+    echo "Flashing Hypriot image succeeded."
+}
+
+if [ ! -f "$ETCHER_DIR/etcher" ]; then
     echo "Could not find etcher-cli. Installing..."
     install_etcher
+else
+    echo "Prior etcher-cli install detected at $ETCHER_DIR"
 fi
 
 if [ ! -f ${HYPRIOT_LOCAL} ]; then
-    echo "Could not find hypriot. Installing..."
+    echo "Could not find Hypriot. Installing..."
     download_hypriot
+else
+    echo "Prior HypriotOS image detected at $HYPRIOT_LOCAL"
 fi
 
-echo "Flashing Hypriot image $HYPRIOT_LOCAL to disk..."
+LSBLK=$(lsblk -o name,mountpoint,label)
+if echo $LSBLK | grep -q HypriotOS; then
+   echo "HypriotOS may have previously been installed:\n$LSBLK"
+   while true; do
+      read -p "Would you like to reinstall? (Y/N) > " REPLY
+      case $REPLY in
+          [yY] ) echo "Reinstalling HypriotOS..."; flash_hypriot; break;;
+          [nN] ) echo "Aborted Hypriot install."; break;;
+      esac
+   done
+fi
 
-${INSTALL_DIR}/etcher ${HYPRIOT_LOCAL}
+write_userdata()
+{
+    echo "Configuring DuckiebotOS (press ^C to cancel)..."
+    MOUNTPOINT=$(mktemp -d)
+    mount -L HypriotOS $MOUNTPOINT
 
-echo "Flashing Hypriot image succeeded."
+    DEFAULT_HOSTNAME="duckiebot"
+    DEFAULT_USERNAME="duckie"
+    DEFAULT_PASSWORD="quackquack"
+    DEFAULT_WIFISSID="DuckieWiFi"
+    DEFAULT_WIFIPASS="quackquack"
 
-read -p "Please enter a hostname  > " HOSTNAME
-read -p "Please enter a username  > " USERNAME
-read -p "Please enter a password  > " PASSWORD
-read -p "Please enter a wifi-ssid > " WIFI_SSID
-read -p "Please enter a wifi-psk  > " WIFI_PSK
-
-MOUNTPOINT=$(mktemp -d)
-mount -L HypriotOS $MOUNTPOINT
-
-echo "Writing user-data to HypriotOS..."
-
-echo -e "
-#cloud-config
+    read -p "Please enter a username (default is $DEFAULT_USERNAME) > " USERNAME
+    USERNAME=${USERNAME:-$DEFAULT_USERNAME}
+    read -p "Please enter a password (default is $DEFAULT_PASSWORD) > " PASSWORD
+    PASSWORD=${PASSWORD:-$DEFAULT_PASSWORD}
+    read -p "Please enter a hostname (default is $DEFAULT_HOSTNAME) > " HOSTNAME
+    HOSTNAME=${HOSTNAME:-$DEFAULT_HOSTNAME}
+    read -p "Please enter a WIFI SSID (default is $DEFAULT_WIFISSID) > " WIFISSID
+    WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
+    read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
+    WIFIPASS=${WIFIPASS:-$DEFAULT_WIFIPASS}
+    
+    echo "Writing custom user-data..."
+    
+    echo "# cloud-config
 # vim: syntax=yaml
 
 # The currently used version of cloud-init is 0.7.9
@@ -96,8 +127,8 @@ write_files:
       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
       update_config=1
       network={
-      ssid="$WIFI_SSID"
-      psk="$WIFI_PSK"
+      ssid="$WIFISSID"
+      psk="$WIFIPASS"
       proto=RSN
       key_mgmt=WPA-PSK
       pairwise=CCMP
@@ -139,11 +170,15 @@ runcmd:
       "--publish", "published=9000,target=9000,mode=host",
       "--mount", "type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock",
       "portainer/portainer", "-H", "unix:///var/run/docker.sock", "--no-auth"
-    ]
-" > $MOUNTPOINT/user-data
+    ]" > $MOUNTPOINT/user-data
+    
+    echo "Un-mounting HypriotOS..."
+    
+    umount $MOUNTPOINT
 
-echo "Un-mounting HypriotOS..."
+    echo "Finished writing to SD card."
+}
 
-umount $MOUNTPOINT
+write_userdata
 
-echo "Installation complete!"
+echo "Installation complete! You may now remove the SD card."
