@@ -94,7 +94,7 @@ write_userdata()
     
     echo "Writing custom user-data..."
     
-    echo "# cloud-config
+    echo "#cloud-config
 # vim: syntax=yaml
 
 # The currently used version of cloud-init is 0.7.9
@@ -105,7 +105,7 @@ manage_etc_hosts: true
 
 users:
   - name: $USERNAME
-    gecos: "Duckietown"
+    gecos: \"Duckietown\"
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     groups: users,docker,video
@@ -127,8 +127,8 @@ write_files:
       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
       update_config=1
       network={
-      ssid="$WIFISSID"
-      psk="$WIFIPASS"
+      ssid=\"$WIFISSID\"
+      psk=\"$WIFIPASS\"
       proto=RSN
       key_mgmt=WPA-PSK
       pairwise=CCMP
@@ -165,11 +165,11 @@ runcmd:
   # for convenience, we will install and start Portainer.io
   - [
       docker, service, create,
-      "--detach=false",
-      "--name", "portainer",
-      "--publish", "published=9000,target=9000,mode=host",
-      "--mount", "type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock",
-      "portainer/portainer", "-H", "unix:///var/run/docker.sock", "--no-auth"
+      \"--detach=false\",
+      \"--name\", \"portainer\",
+      \"--publish\", \"published=9000,target=9000,mode=host\",
+      \"--mount\", \"type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock\",
+      \"portainer/portainer\", \"-H\", \"unix:///var/run/docker.sock\", \"--no-auth\"
     ]" > $MOUNTPOINT/user-data
     
     echo "Un-mounting HypriotOS..."
