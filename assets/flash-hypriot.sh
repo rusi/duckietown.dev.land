@@ -61,10 +61,10 @@ LSBLK=$(lsblk -o name,mountpoint,label)
 if echo $LSBLK | grep -q HypriotOS; then
    echo "HypriotOS may have previously been installed:\n$LSBLK"
    while true; do
-      read -p "Would you like to reinstall? (Y/N) > " REPLY
+      read -p "Would you like to overwrite HypriotOS? (Y/N) > " REPLY
       case $REPLY in
           [yY] ) echo "Reinstalling HypriotOS..."; flash_hypriot; break;;
-          [nN] ) echo "Aborted Hypriot install."; break;;
+          [nN] ) echo "Aborted Hypriot install."; exit; break;;
       esac
    done
 fi
@@ -78,7 +78,7 @@ write_userdata()
     DEFAULT_HOSTNAME="duckiebot"
     DEFAULT_USERNAME="duckie"
     DEFAULT_PASSWORD="quackquack"
-    DEFAULT_WIFISSID="DuckieWiFi"
+    DEFAULT_WIFISSID="duckietown"
     DEFAULT_WIFIPASS="quackquack"
 
     read -p "Please enter a username (default is $DEFAULT_USERNAME) > " USERNAME
