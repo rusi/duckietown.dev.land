@@ -67,14 +67,15 @@ fi
 
 LSBLK=$(lsblk -o name,mountpoint,label)
 if echo $LSBLK | grep -q HypriotOS; then
-   echo "HypriotOS may have previously been installed:\n$LSBLK"
-   while true; do
-      read -p "Would you like to overwrite HypriotOS? (Y/N) > " REPLY
-      case $REPLY in
-          [yY] ) echo "Reinstalling HypriotOS..."; flash_hypriot; break;;
-          [nN] ) echo "Aborted Hypriot install."; exit; break;;
-      esac
-   done
+    echo "HypriotOS may have previously been installed:\n$LSBLK"
+    while true; do
+        read -p "Would you like to overwrite HypriotOS? (Y/N) > " REPLY
+        case $REPLY in
+            [yY] ) echo "Reinstalling HypriotOS..."; flash_hypriot; break;;
+            [nN] ) echo "Aborted Hypriot install."; exit; break;;
+        esac
+    done
+    else flash_hypriot 
 fi
 
 write_userdata()
