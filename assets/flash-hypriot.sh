@@ -12,7 +12,7 @@ ETCHER_URL="https://github.com/resin-io/etcher/releases/download/v1.4.4/etcher-c
 ETCHER_DIR="/tmp/etcher-cli"
 ETCHER_LOCAL=$(mktemp)
 
-HYPRIOT_URL="https://github.com/hypriot/image-builder-rpi/releases/download/v1.8.0/hypriotos-rpi-v1.8.0.img.zip"
+HYPRIOT_URL="https://github.com/hypriot/image-builder-rpi/releases/download/v1.9.0/hypriotos-rpi-v1.9.0.img.zip"
 HYPRIOT_FILE=${HYPRIOT_URL##*/}
 HYPRIOT_LOCAL="/tmp/$HYPRIOT_FILE"
 
