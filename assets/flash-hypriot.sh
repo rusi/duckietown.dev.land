@@ -25,7 +25,7 @@ install_etcher()
 {
     # Download tool to burn image
     echo "Downloading etcher-cli..."
-    wget -O ${ETCHER_LOCAL} ${ETCHER_URL}
+    wget -cO ${ETCHER_LOCAL} ${ETCHER_URL}
     echo "Downloading complete."
     
     # Unpack archive
@@ -38,7 +38,7 @@ download_hypriot()
 {
     # Download the Hypriot Image
     echo "Downloading Hypriot image to ${HYPRIOT_LOCAL}"
-    wget -O ${HYPRIOT_LOCAL} ${HYPRIOT_URL}
+    wget -cO ${HYPRIOT_LOCAL} ${HYPRIOT_URL}
     echo "Downloading complete."
 }
 
@@ -58,12 +58,7 @@ else
     echo "Prior etcher-cli install detected at $ETCHER_DIR"
 fi
 
-if [ ! -f ${HYPRIOT_LOCAL} ]; then
-    echo "Could not find Hypriot. Installing..."
-    download_hypriot
-else
-    echo "Prior HypriotOS image detected at $HYPRIOT_LOCAL"
-fi
+download_hypriot
 
 LSBLK=$(lsblk -o name,mountpoint,label)
 if echo $LSBLK | grep -q HypriotOS; then
