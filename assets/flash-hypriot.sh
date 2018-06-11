@@ -166,6 +166,9 @@ runcmd:
   - [ systemctl, start, --no-block, docker ]
 
   - [docker, swarm, init ]
+  
+# will run on every boot
+bootcmd:
   # for convenience, we will install and start Portainer.io
   - [
       docker, service, create,
