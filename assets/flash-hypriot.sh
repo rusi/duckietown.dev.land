@@ -12,7 +12,7 @@ ETCHER_URL="https://github.com/resin-io/etcher/releases/download/v1.4.4/etcher-c
 ETCHER_DIR="/tmp/etcher-cli"
 ETCHER_LOCAL=$(mktemp)
 
-HYPRIOT_URL="https://github.com/hypriot/image-builder-rpi/releases/download/v1.7.1/hypriotos-rpi-v1.7.1.img.zip"
+HYPRIOT_URL="https://github.com/hypriot/image-builder-rpi/releases/download/v1.9.0/hypriotos-rpi-v1.9.0.img.zip"
 HYPRIOT_FILE=${HYPRIOT_URL##*/}
 HYPRIOT_LOCAL="/tmp/$HYPRIOT_FILE"
 
@@ -158,7 +158,6 @@ runcmd:
   - 'ifup wlan0'
 
   - 'mkdir /data && chown 1000:1000 /data'
-
   - [ systemctl, stop, docker ]
   - [ systemctl, daemon-reload ]
   - [ systemctl, enable, docker-tcp.socket ]
@@ -167,8 +166,26 @@ runcmd:
 
   - [docker, swarm, init ]
   
+  # for convenience, we will install and start Portainer.io
+  - [
+      docker, service, create,
+      \"--detach=false\",
+      \"--name\", \"portainer\",
+      \"--publish\", \"published=9000,target=9000,mode=host\",
+      \"--mount\", \"type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock\",
+      \"portainer/portainer\", \"-H\", \"unix:///var/run/docker.sock\", \"--no-auth\"
+    ]
+
 # will run on every boot
 bootcmd:
+  - [ systemctl, stop, docker ]
+  - [ systemctl, daemon-reload ]
+  - [ systemctl, enable, docker-tcp.socket ]
+  - [ systemctl, start, --no-block, docker-tcp.socket ]
+  - [ systemctl, start, --no-block, docker ]
+
+  - [docker, swarm, init ]
+  
   # for convenience, we will install and start Portainer.io
   - [
       docker, service, create,
