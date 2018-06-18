@@ -8,13 +8,15 @@ if [ $(id -u) != "0" ]; then
     exec sudo "$0" "$@"
 fi
 
-ETCHER_URL="https://github.com/resin-io/etcher/releases/download/v1.4.4/etcher-cli-1.4.4-linux-x86.tar.gz"
-ETCHER_DIR="/tmp/etcher-cli"
-ETCHER_LOCAL=$(mktemp)
-
-HYPRIOT_URL="https://github.com/hypriot/image-builder-rpi/releases/download/v1.9.0/hypriotos-rpi-v1.9.0.img.zip"
-HYPRIOT_FILE=${HYPRIOT_URL##*/}
-HYPRIOT_LOCAL="/tmp/$HYPRIOT_FILE"
+if [ -n "$ETCHER_URL" ]; then
+    ETCHER_URL="https://github.com/resin-io/etcher/releases/download/v1.4.4/etcher-cli-1.4.4-linux-x86.tar.gz"
+    ETCHER_DIR="/tmp/etcher-cli"
+    ETCHER_LOCAL=$(mktemp)
+    
+    HYPRIOT_URL="https://github.com/hypriot/image-builder-rpi/releases/download/v1.9.0/hypriotos-rpi-v1.9.0.img.zip"
+    HYPRIOT_FILE=${HYPRIOT_URL##*/}
+    HYPRIOT_LOCAL="/tmp/$HYPRIOT_FILE"
+fi
 
 install_deps()
 {
@@ -76,8 +78,8 @@ fi
 write_userdata()
 {
     echo "Configuring DuckiebotOS (press ^C to cancel)..."
-    MOUNTPOINT=$(mktemp -d)
-    mount -L HypriotOS $MOUNTPOINT
+    HYPRIOT_MOUNTPOINT=$(mktemp -d)
+    mount -L HypriotOS $HYPRIOT_MOUNTPOINT
 
     DEFAULT_HOSTNAME="duckiebot"
     DEFAULT_USERNAME="duckie"
@@ -155,17 +157,27 @@ write_files:
 # These commands will be run once on first boot only
 runcmd:
   - 'systemctl restart avahi-daemon'
-#  - 'ifup wlan0'
-
   - 'mkdir /data && chown 1000:1000 /data'
   - [ systemctl, stop, docker ]
   - [ systemctl, daemon-reload ]
   - [ systemctl, enable, docker-tcp.socket ]
   - [ systemctl, start, --no-block, docker-tcp.socket ]
   - [ systemctl, start, --no-block, docker ]
+  - [ docker, swarm, init ]" > $HYPRIOT_MOUNTPOINT/user-data
 
-  - [docker, swarm, init ]
-  
+    if [ -f /.dockerenv ]; then
+	# If we are inside Docker then we have preloaded the images
+        ROOT_MOUNTPOINT=$(mktemp -d)
+        mount -L root $ROOT_MOUNTPOINT
+        echo "Writing preloaded Docker images to /var/local/"
+        cp /{portainer.tar.gz, software.tar.gz} $ROOT_MOUNTPOINT/var/local/
+        echo "
+  - [ docker, load, \"--input\", \"/var/local/portainer.tar.gz\"]
+  - [ docker, load, \"--input\", \"/var/local/software.tar.gz\"]" >> $HYPRIOT_MOUNTPOINT/user-data
+        umount $ROOT_MOUNTPOINT
+    fi
+
+    echo "
   # for convenience, we will install and start Portainer.io
   - [
       docker, service, create,
@@ -174,31 +186,10 @@ runcmd:
       \"--publish\", \"published=9000,target=9000,mode=host\",
       \"--mount\", \"type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock\",
       \"portainer/portainer\", \"-H\", \"unix:///var/run/docker.sock\", \"--no-auth\"
-    ]
+    ]" >> $HYPRIOT_MOUNTPOINT/user-data 
 
-# These commands will be run on every boot
-#bootcmd:
-#  - [ systemctl, stop, docker ]
-#  - [ systemctl, daemon-reload ]
-#  - [ systemctl, enable, docker-tcp.socket ]
-#  - [ systemctl, start, --no-block, docker-tcp.socket ]
-#  - [ systemctl, start, --no-block, docker ]
-#
-#  - [docker, swarm, init ]
-#  
-#  # for convenience, we will install and start Portainer.io
-#  - [
-#      docker, service, create,
-#      \"--detach=false\",
-#      \"--name\", \"portainer\",
-#      \"--publish\", \"published=9000,target=9000,mode=host\",
-#      \"--mount\", \"type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock\",
-#      \"portainer/portainer\", \"-H\", \"unix:///var/run/docker.sock\", \"--no-auth\"
-    " > $MOUNTPOINT/user-data
-    
     echo "Un-mounting HypriotOS..."
-    
-    umount $MOUNTPOINT
+    umount $HYPRIOT_MOUNTPOINT
 
     echo "Finished writing to SD card."
 }
