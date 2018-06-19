@@ -8,63 +8,120 @@ if [ $(id -u) != "0" ]; then
     exec sudo "$0" "$@"
 fi
 
-if [ -n "$ETCHER_URL" ]; then
+if [ -z "$ETCHER_URL" ]; then
+    echo "Setting environment variables..."
     ETCHER_URL="https://github.com/resin-io/etcher/releases/download/v1.4.4/etcher-cli-1.4.4-linux-x86.tar.gz"
     ETCHER_DIR="/tmp/etcher-cli"
     ETCHER_LOCAL=$(mktemp)
     
     HYPRIOT_URL="https://github.com/hypriot/image-builder-rpi/releases/download/v1.9.0/hypriotos-rpi-v1.9.0.img.zip"
-    HYPRIOT_FILE=${HYPRIOT_URL##*/}
-    HYPRIOT_LOCAL="/tmp/$HYPRIOT_FILE"
+    HYPRIOT_LOCAL="/tmp/${HYPRIOT_URL##*/}"
+
+    IMAGE_DOWNLOADER_URL="https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh"
+    IMAGE_DOWNLOADER_LOCAL="/tmp/${IMAGE_DOWNLOADER_URL##*/}"
+
+    FLASHER_URL="https://raw.githubusercontent.com/rusi/duckietown.dev.land/master/assets/flash-hypriot.sh"
+    FLASHER_LOCAL="/tmp/${FLASHER_URL##*/}"
+
+    FLASH_URL="https://github.com/hypriot/flash/releases/download/2.1.1/flash"
+    FLASH_LOCAL="/tmp/${FLASH_URL##*/}"
 fi
 
-install_deps()
-{
-    apt-get -y install wget tar lib32stdc++6
+install_deps() {
+    apt-get -y install wget tar lib32stdc++6 \
+               curl pv unzip hdparm sudo file udev \
+               golang-go \
+               --no-install-recommends
 }
 
-install_etcher()
-{
-    # Download tool to burn image
-    echo "Downloading etcher-cli..."
-    wget -cO ${ETCHER_LOCAL} ${ETCHER_URL}
-    echo "Downloading complete."
-    
-    # Unpack archive
-    mkdir $ETCHER_DIR
-    echo "Installing etcher-cli to $ETCHER_DIR..."
-    tar fvx ${ETCHER_LOCAL} -C ${ETCHER_DIR} --strip-components=1
+install_flasher() {
+    if [ -f "$ETCHER_DIR/etcher" ]; then
+        echo "Prior etcher-cli install detected at $ETCHER_DIR"
+    else
+        echo "Could not find etcher-cli. Installing..."
+        # Download tool to burn image
+        echo "Downloading etcher-cli..."
+        wget -cO "${ETCHER_LOCAL}" "${ETCHER_URL}"
+        
+        # Unpack archive
+        echo "Installing etcher-cli to $ETCHER_DIR..."
+        mkdir $ETCHER_DIR && tar fvx ${ETCHER_LOCAL} -C ${ETCHER_DIR} --strip-components=1
+    fi
+
+    echo "Downloading hypriot/flash..."
+    if [ -f $FLASH_LOCAL ]; then
+        echo "hypriot/flash was previously downloaded to $FLASH_LOCAL, skipping..."
+    else
+        wget -cO ${FLASH_LOCAL} ${FLASH_URL} && chmod 777 ${FLASH_LOCAL}
+    fi
+
+    rm -rf ${ETCHER_LOCAL}
 }
 
-download_hypriot()
-{
-    # Download the Hypriot Image
-    echo "Downloading Hypriot image to ${HYPRIOT_LOCAL}"
-    wget -cO ${HYPRIOT_LOCAL} ${HYPRIOT_URL}
-    echo "Downloading complete."
+download_hypriot() {
+    if [ -f $HYPRIOT_LOCAL ]; then
+        echo "HypriotOS image was previously downloaded to $HYPRIOT_LOCAL, skipping..."
+    else
+        # Download the Hypriot Image echo "Downloading Hypriot image to ${HYPRIOT_LOCAL}"
+        wget -cO ${HYPRIOT_LOCAL} ${HYPRIOT_URL}
+        echo "Downloading Hypriot image complete."
+    fi
 }
 
-flash_hypriot()
-{
+flash_hypriot() {
     echo "Flashing Hypriot image $HYPRIOT_LOCAL to disk..."
     if [ -f /.dockerenv ]; then
-        /flash.sh ${HYPRIOT_LOCAL}
+        ${FLASH_LOCAL} ${HYPRIOT_LOCAL}
     else
         ${ETCHER_DIR}/etcher ${HYPRIOT_LOCAL}
     fi
     echo "Flashing Hypriot image succeeded."
 }
 
+download_docker_images_from_inside_docker() {
+    if [ -f /tmp/portainer.tar.gz ]; then
+        echo "portainer/portainer was previously downloaded to /tmp/portainer.tar.gz, skipping..."
+    else
+        echo "Downloading image downloader from ${IMAGE_DOWNLOADER_URL}"
+        wget -cO ${IMAGE_DOWNLOADER_LOCAL} ${IMAGE_DOWNLOADER_URL} && chmod 777 ${IMAGE_DOWNLOADER_LOCAL}
+
+        mkdir /tmp/portainer /tmp/software
+
+        echo "Downloading portainer/portainer:latest from Docker Hub..."
+        ${IMAGE_DOWNLOADER_LOCAL} /tmp/portainer portainer/portainer:latest
+        tar -czvf /tmp/portainer.tar.gz /tmp/portainer/
+    fi 
+    # echo "Downloading duckietown/software:latest from Docker Hub..."
+    # ${IMAGE_DOWNLOADER_LOCAL} /tmp/software duckietown/software:latest
+    # tar -czvf /tmp/software.tar.gz /tmp/software/
+
+    rm -rf /tmp/portainer /tmp/software
+}
+
+download_docker_images_from_outside_docker() {
+    echo "Downloading portainer/portainer:latest from Docker Hub..."
+    if [ -f /tmp/portainer.tar.gz ]; then
+        echo "portainer/portainer was previously downloaded to /tmp/portainer.tar.gz, skipping..."
+    else
+        docker pull portainer/portainer && docker save --output /tmp/portainer.tar.gz portainer/portainer:latest
+    fi
+    # echo "Downloading duckietown/software:latest from Docker Hub..."
+    # docker pull duckietown/software && docker save --output /tmp/software.tar.gz duckietown/software:latest
+}
+
 install_deps
 
-if [ ! -f "$ETCHER_DIR/etcher" ]; then
-    echo "Could not find etcher-cli. Installing..."
-    install_etcher
-else
-    echo "Prior etcher-cli install detected at $ETCHER_DIR"
-fi
+install_flasher
 
 download_hypriot
+
+if [ -f /.dockerenv ]; then
+    echo "Docker container detected. Downloading image manually..."
+    download_docker_images_from_inside_docker
+else
+    echo "Linux detected. Downloading image with docker save..."
+    download_docker_images_from_outside_docker
+fi
 
 LSBLK=$(lsblk -o name,mountpoint,label)
 if echo $LSBLK | grep -q HypriotOS; then
@@ -79,8 +136,7 @@ if echo $LSBLK | grep -q HypriotOS; then
     else flash_hypriot 
 fi
 
-write_userdata()
-{
+write_userdata() {
     echo "Configuring DuckiebotOS (press ^C to cancel)..."
     HYPRIOT_MOUNTPOINT=$(mktemp -d)
     mount -L HypriotOS $HYPRIOT_MOUNTPOINT
@@ -103,8 +159,9 @@ write_userdata()
     WIFIPASS=${WIFIPASS:-$DEFAULT_WIFIPASS}
     
     echo "Writing custom user-data..."
-    
-    echo "#cloud-config
+
+USER_DATA=$(cat <<EOF
+#cloud-config
 # vim: syntax=yaml
 
 # The currently used version of cloud-init is 0.7.9
@@ -115,7 +172,7 @@ manage_etc_hosts: true
 
 users:
   - name: $USERNAME
-    gecos: \"Duckietown\"
+    gecos: "Duckietown"
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     groups: users,docker,video
@@ -137,8 +194,8 @@ write_files:
       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
       update_config=1
       network={
-      ssid=\"$WIFISSID\"
-      psk=\"$WIFIPASS\"
+      ssid="$WIFISSID"
+      psk="$WIFIPASS"
       proto=RSN
       key_mgmt=WPA-PSK
       pairwise=CCMP
@@ -167,30 +224,32 @@ runcmd:
   - [ systemctl, enable, docker-tcp.socket ]
   - [ systemctl, start, --no-block, docker-tcp.socket ]
   - [ systemctl, start, --no-block, docker ]
-  - [ docker, swarm, init ]" > $HYPRIOT_MOUNTPOINT/user-data
+  - [ docker, swarm, init ]
+  - [ docker, load, "--input", "/var/local/portainer.tar.gz"]
+# Disabled pre-loading duckietown/software due to insuffient space on /var/local
+# https://github.com/hypriot/image-builder-rpi/issues/244#issuecomment-390512469
+#  - [ docker, load, "--input", "/var/local/software.tar.gz"]
 
-    if [ -f /.dockerenv ]; then
-	# If we are inside Docker then we have already preloaded the images
-        ROOT_MOUNTPOINT=$(mktemp -d)
-        mount -L root $ROOT_MOUNTPOINT
-        echo "Writing preloaded Docker images to /var/local/"
-        cp /{portainer.tar.gz, software.tar.gz} $ROOT_MOUNTPOINT/var/local/
-        echo "
-  - [ docker, load, \"--input\", \"/var/local/portainer.tar.gz\"]
-  - [ docker, load, \"--input\", \"/var/local/software.tar.gz\"]" >> $HYPRIOT_MOUNTPOINT/user-data
-        umount $ROOT_MOUNTPOINT
-    fi
-
-    echo "
-  # for convenience, we will install and start Portainer.io
+# for convenience, we will install and start Portainer.io
   - [
       docker, service, create,
-      \"--detach=false\",
-      \"--name\", \"portainer\",
-      \"--publish\", \"published=9000,target=9000,mode=host\",
-      \"--mount\", \"type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock\",
-      \"portainer/portainer\", \"-H\", \"unix:///var/run/docker.sock\", \"--no-auth\"
-    ]" >> $HYPRIOT_MOUNTPOINT/user-data 
+      "--detach=false",
+      "--name", "portainer",
+      "--publish", "published=9000,target=9000,mode=host",
+      "--mount", "type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock",
+      "portainer/portainer:latest", "-H", "unix:///var/run/docker.sock", "--no-auth"
+    ]
+EOF
+)
+
+    echo "$USER_DATA" > $HYPRIOT_MOUNTPOINT/user-data
+
+    ROOT_MOUNTPOINT=$(mktemp -d)
+    mount -L root $ROOT_MOUNTPOINT
+    echo "Writing preloaded Docker images to /var/local/"
+    cp /tmp/portainer.tar.gz $ROOT_MOUNTPOINT/var/local/
+#    cp /tmp/software.tar.gz $ROOT_MOUNTPOINT/var/local/
+    umount $ROOT_MOUNTPOINT
 
     echo "Un-mounting HypriotOS..."
     umount $HYPRIOT_MOUNTPOINT
