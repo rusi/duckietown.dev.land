@@ -47,7 +47,11 @@ download_hypriot()
 flash_hypriot()
 {
     echo "Flashing Hypriot image $HYPRIOT_LOCAL to disk..."
-    ${ETCHER_DIR}/etcher ${HYPRIOT_LOCAL}
+    if [ -f /.dockerenv ]; then
+        /flash.sh ${HYPRIOT_LOCAL}
+    else
+        ${ETCHER_DIR}/etcher ${HYPRIOT_LOCAL}
+    fi
     echo "Flashing Hypriot image succeeded."
 }
 
@@ -166,7 +170,7 @@ runcmd:
   - [ docker, swarm, init ]" > $HYPRIOT_MOUNTPOINT/user-data
 
     if [ -f /.dockerenv ]; then
-	# If we are inside Docker then we have preloaded the images
+	# If we are inside Docker then we have already preloaded the images
         ROOT_MOUNTPOINT=$(mktemp -d)
         mount -L root $ROOT_MOUNTPOINT
         echo "Writing preloaded Docker images to /var/local/"
