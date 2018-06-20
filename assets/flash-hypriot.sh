@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -32,10 +32,9 @@ install_deps() {
 }
 
 install_flasher() {
-    if [ -f "$ETCHER_DIR/etcher" ]; then
+    if [ -f "$ETCHER_DIR/etcher" ] && [ -z "$1" ]; then
         echo "Prior etcher-cli install detected at $ETCHER_DIR"
     else
-        echo "Could not find etcher-cli. Installing..."
         # Download tool to burn image
         echo "Downloading etcher-cli..."
         wget -cO "${ETCHER_LOCAL}" "${ETCHER_URL}"
@@ -44,11 +43,11 @@ install_flasher() {
         echo "Installing etcher-cli to $ETCHER_DIR..."
         mkdir $ETCHER_DIR && tar fvx ${ETCHER_LOCAL} -C ${ETCHER_DIR} --strip-components=1
     fi
-
-    echo "Downloading hypriot/flash..."
-    if [ -f $FLASH_LOCAL ]; then
+   
+    if [ -f $FLASH_LOCAL ] && [ -z "$1" ]; then
         echo "hypriot/flash was previously downloaded to $FLASH_LOCAL, skipping..."
     else
+        echo "Installing hypriot/flash to $FLASH_LOCAL..."
         wget -cO ${FLASH_LOCAL} ${FLASH_URL} && chmod 777 ${FLASH_LOCAL}
     fi
 
@@ -56,7 +55,7 @@ install_flasher() {
 }
 
 download_hypriot() {
-    if [ -f $HYPRIOT_LOCAL ]; then
+    if [ -f $HYPRIOT_LOCAL ] && [ -z "$1" ]; then
         echo "HypriotOS image was previously downloaded to $HYPRIOT_LOCAL, skipping..."
     else
         # Download the Hypriot Image echo "Downloading Hypriot image to ${HYPRIOT_LOCAL}"
@@ -76,7 +75,7 @@ flash_hypriot() {
 }
 
 download_docker_images_from_inside_docker() {
-    if [ -f /tmp/portainer.tar.gz ]; then
+    if [ -f /tmp/portainer.tar.gz ] && [ -z "$1" ]; then
         echo "portainer/portainer was previously downloaded to /tmp/portainer.tar.gz, skipping..."
     else
         echo "Downloading image downloader from ${IMAGE_DOWNLOADER_URL}"
@@ -97,7 +96,7 @@ download_docker_images_from_inside_docker() {
 
 download_docker_images_from_outside_docker() {
     echo "Downloading portainer/portainer:latest from Docker Hub..."
-    if [ -f /tmp/portainer.tar.gz ]; then
+    if [ -f /tmp/portainer.tar.gz ] && [ -z "$1" ]; then
         echo "portainer/portainer was previously downloaded to /tmp/portainer.tar.gz, skipping..."
     else
         docker pull portainer/portainer && docker save --output /tmp/portainer.tar.gz portainer/portainer:latest
@@ -118,6 +117,10 @@ if [ -f /.dockerenv ]; then
 else
     echo "Linux detected. Downloading image with docker save..."
     download_docker_images_from_outside_docker
+fi
+
+if [ -n "$1" ]; then
+    echo "Dependencies installed."; exit
 fi
 
 LSBLK=$(lsblk -o name,mountpoint,label)
