@@ -110,7 +110,6 @@ install_deps
 install_flasher
 
 download_hypriot
-
 if [ -f /.dockerenv ]; then
     echo "Docker container detected. Downloading image manually..."
     download_docker_images_from_inside_docker
@@ -125,15 +124,15 @@ fi
 
 LSBLK=$(lsblk -o name,mountpoint,label)
 if echo $LSBLK | grep -q HypriotOS; then
-    echo "HypriotOS may have previously been installed:\n$LSBLK"
+    echo "$LSBLK\n"
     while true; do
-        read -p "Would you like to overwrite HypriotOS? (Y/N) > " REPLY
+        read -p "HypriotOS detected on existing device. Would you like to continue? (Y/N) > " REPLY
         case $REPLY in
             [yY] ) echo "Reinstalling HypriotOS..."; flash_hypriot; break;;
             [nN] ) echo "Aborted Hypriot install."; exit; break;;
         esac
     done
-    else flash_hypriot 
+else flash_hypriot 
 fi
 
 write_userdata() {
@@ -231,14 +230,11 @@ runcmd:
 #  - [ docker, load, "--input", "/var/local/software.tar.gz"]
 
 # for convenience, we will install and start Portainer.io
-  - [
-      docker, service, create,
-      "--detach=false",
-      "--name", "portainer",
-      "--publish", "published=9000,target=9000,mode=host",
-      "--mount", "type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock",
-      "portainer/portainer:latest", "-H", "unix:///var/run/docker.sock", "--no-auth"
-    ]
+  - 'DIGEST=$(docker image inspect --format "{{(index .RepoDigests 0)}}" portainer/portainer) && 
+     docker service create --detach=false --name portainer 
+     --publish published=9000,target=9000,mode=host
+     --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock
+     $DIGEST -H unix:///var/run/docker.sock --no-auth'
 EOF
 )
 
