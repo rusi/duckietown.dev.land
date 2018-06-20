@@ -75,18 +75,14 @@ flash_hypriot() {
 }
 
 download_docker_images_from_inside_docker() {
-    if [ -f /tmp/portainer.tar.gz ]; then
-        echo "portainer/portainer was previously downloaded to /tmp/portainer.tar.gz, skipping..."
-    else
-        echo "Downloading image downloader from ${IMAGE_DOWNLOADER_URL}"
-        wget -cO ${IMAGE_DOWNLOADER_LOCAL} ${IMAGE_DOWNLOADER_URL} && chmod 777 ${IMAGE_DOWNLOADER_LOCAL}
+    echo "Downloading image downloader from ${IMAGE_DOWNLOADER_URL}"
+    wget -cO ${IMAGE_DOWNLOADER_LOCAL} ${IMAGE_DOWNLOADER_URL} && chmod 777 ${IMAGE_DOWNLOADER_LOCAL}
+    mkdir /tmp/portainer /tmp/software
 
-        mkdir /tmp/portainer /tmp/software
+    echo "Downloading portainer/portainer:latest from Docker Hub..."
+    ${IMAGE_DOWNLOADER_LOCAL} /tmp/portainer portainer/portainer:latest
+    tar -czvf /tmp/portainer.tar.gz /tmp/portainer/
 
-        echo "Downloading portainer/portainer:latest from Docker Hub..."
-        ${IMAGE_DOWNLOADER_LOCAL} /tmp/portainer portainer/portainer:latest
-        tar -czvf /tmp/portainer.tar.gz /tmp/portainer/
-    fi 
     # echo "Downloading duckietown/software:latest from Docker Hub..."
     # ${IMAGE_DOWNLOADER_LOCAL} /tmp/software duckietown/software:latest
     # tar -czvf /tmp/software.tar.gz /tmp/software/
@@ -110,6 +106,7 @@ install_deps
 install_flasher
 
 download_hypriot
+
 if [ -f /.dockerenv ]; then
     echo "Docker container detected. Downloading image manually..."
     download_docker_images_from_inside_docker
@@ -121,6 +118,24 @@ fi
 if [ -n "$1" ]; then
     echo "Dependencies installed."; exit
 fi
+
+echo "Configuring DuckiebotOS (press ^C to cancel)..."
+
+DEFAULT_HOSTNAME="duckiebot"
+DEFAULT_USERNAME="duckie"
+DEFAULT_PASSWORD="quackquack"
+DEFAULT_WIFISSID="duckietown"
+DEFAULT_WIFIPASS="quackquack"
+
+read -p "Please enter a username (default is $DEFAULT_USERNAME) > " USERNAME
+USERNAME=${USERNAME:-$DEFAULT_USERNAME}
+read -p "Please enter a password (default is $DEFAULT_PASSWORD) > " PASSWORD
+PASSWORD=${PASSWORD:-$DEFAULT_PASSWORD}
+read -p "Please enter a hostname (default is $DEFAULT_HOSTNAME) > " HOSTNAME
+HOSTNAME=${HOSTNAME:-$DEFAULT_HOSTNAME}
+read -p "Please enter a WIFI SSID (default is $DEFAULT_WIFISSID) > " WIFISSID
+WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
+read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
 
 LSBLK=$(lsblk -o name,mountpoint,label)
 if echo $LSBLK | grep -q HypriotOS; then
@@ -135,36 +150,37 @@ if echo $LSBLK | grep -q HypriotOS; then
 else flash_hypriot 
 fi
 
-write_userdata() {
-    echo "Configuring DuckiebotOS (press ^C to cancel)..."
-    HYPRIOT_MOUNTPOINT=$(mktemp -d)
-    mount -L HypriotOS $HYPRIOT_MOUNTPOINT
-
-    DEFAULT_HOSTNAME="duckiebot"
-    DEFAULT_USERNAME="duckie"
-    DEFAULT_PASSWORD="quackquack"
-    DEFAULT_WIFISSID="duckietown"
-    DEFAULT_WIFIPASS="quackquack"
-
-    read -p "Please enter a username (default is $DEFAULT_USERNAME) > " USERNAME
-    USERNAME=${USERNAME:-$DEFAULT_USERNAME}
-    read -p "Please enter a password (default is $DEFAULT_PASSWORD) > " PASSWORD
-    PASSWORD=${PASSWORD:-$DEFAULT_PASSWORD}
-    read -p "Please enter a hostname (default is $DEFAULT_HOSTNAME) > " HOSTNAME
-    HOSTNAME=${HOSTNAME:-$DEFAULT_HOSTNAME}
-    read -p "Please enter a WIFI SSID (default is $DEFAULT_WIFISSID) > " WIFISSID
-    WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
-    read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
-    WIFIPASS=${WIFIPASS:-$DEFAULT_WIFIPASS}
-
+write_duckieos_files() {
+    echo "Configuring DuckieOS installation..." 
+    # Preload image(s) to speed up first boot
     ROOT_MOUNTPOINT=$(mktemp -d)
     mount -L root $ROOT_MOUNTPOINT
     echo "Writing preloaded Docker images to /var/local/"
     cp /tmp/portainer.tar.gz $ROOT_MOUNTPOINT/var/local/
     # cp /tmp/software.tar.gz $ROOT_MOUNTPOINT/var/local/
+
+    # Add i2c to boot configuration
+    echo "dtparam=i2c1=on" | tee -a $ROOT_MOUNTPOINT/boot/config.txt  
+    echo "dtparam=i2c_arm=on" | tee -a $ROOT_MOUNTPOINT/boot/config.txt 
+    echo "i2c-bcm2708" | tee -a $ROOT_MOUNTPOINT/etc/modules 
+    echo "i2c-dev" | tee -a $ROOT_MOUNTPOINT/etc/modules 
     umount $ROOT_MOUNTPOINT
-    
-    echo "Writing custom user-data..."
+}
+
+write_userdata() {
+    echo "Writing custom cloud-init user-data..."
+
+    HYPRIOT_MOUNTPOINT=$(mktemp -d)
+    mount -L HypriotOS $HYPRIOT_MOUNTPOINT
+    echo "$USER_DATA" > $HYPRIOT_MOUNTPOINT/user-data
+    echo "Un-mounting HypriotOS..."
+    umount $HYPRIOT_MOUNTPOINT
+
+    echo "Installation complete! You may now remove the SD card."
+}
+
+write_duckieos_files
+
 USER_DATA=$(cat <<EOF
 #cloud-config
 # vim: syntax=yaml
@@ -244,11 +260,4 @@ runcmd:
 EOF
 )
 
-    echo "$USER_DATA" > $HYPRIOT_MOUNTPOINT/user-data
-    echo "Un-mounting HypriotOS..."
-    umount $HYPRIOT_MOUNTPOINT
-}
-
 write_userdata
-
-echo "Installation complete! You may now remove the SD card."
