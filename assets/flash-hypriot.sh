@@ -156,9 +156,15 @@ write_userdata() {
     WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
     read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
     WIFIPASS=${WIFIPASS:-$DEFAULT_WIFIPASS}
+
+    ROOT_MOUNTPOINT=$(mktemp -d)
+    mount -L root $ROOT_MOUNTPOINT
+    echo "Writing preloaded Docker images to /var/local/"
+    cp /tmp/portainer.tar.gz $ROOT_MOUNTPOINT/var/local/
+    # cp /tmp/software.tar.gz $ROOT_MOUNTPOINT/var/local/
+    umount $ROOT_MOUNTPOINT
     
     echo "Writing custom user-data..."
-
 USER_DATA=$(cat <<EOF
 #cloud-config
 # vim: syntax=yaml
@@ -239,18 +245,8 @@ EOF
 )
 
     echo "$USER_DATA" > $HYPRIOT_MOUNTPOINT/user-data
-
-    ROOT_MOUNTPOINT=$(mktemp -d)
-    mount -L root $ROOT_MOUNTPOINT
-    echo "Writing preloaded Docker images to /var/local/"
-    cp /tmp/portainer.tar.gz $ROOT_MOUNTPOINT/var/local/
-#    cp /tmp/software.tar.gz $ROOT_MOUNTPOINT/var/local/
-    umount $ROOT_MOUNTPOINT
-
     echo "Un-mounting HypriotOS..."
     umount $HYPRIOT_MOUNTPOINT
-
-    echo "Finished writing to SD card."
 }
 
 write_userdata
