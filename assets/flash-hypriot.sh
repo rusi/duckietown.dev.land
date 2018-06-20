@@ -32,7 +32,7 @@ install_deps() {
 }
 
 install_flasher() {
-    if [ -f "$ETCHER_DIR/etcher" ] && [ -z "$1" ]; then
+    if [ -f "$ETCHER_DIR/etcher" ]; then
         echo "Prior etcher-cli install detected at $ETCHER_DIR"
     else
         # Download tool to burn image
@@ -44,7 +44,7 @@ install_flasher() {
         mkdir $ETCHER_DIR && tar fvx ${ETCHER_LOCAL} -C ${ETCHER_DIR} --strip-components=1
     fi
    
-    if [ -f $FLASH_LOCAL ] && [ -z "$1" ]; then
+    if [ -f $FLASH_LOCAL ]; then
         echo "hypriot/flash was previously downloaded to $FLASH_LOCAL, skipping..."
     else
         echo "Installing hypriot/flash to $FLASH_LOCAL..."
@@ -55,7 +55,7 @@ install_flasher() {
 }
 
 download_hypriot() {
-    if [ -f $HYPRIOT_LOCAL ] && [ -z "$1" ]; then
+    if [ -f $HYPRIOT_LOCAL ]; then
         echo "HypriotOS image was previously downloaded to $HYPRIOT_LOCAL, skipping..."
     else
         # Download the Hypriot Image echo "Downloading Hypriot image to ${HYPRIOT_LOCAL}"
@@ -75,7 +75,7 @@ flash_hypriot() {
 }
 
 download_docker_images_from_inside_docker() {
-    if [ -f /tmp/portainer.tar.gz ] && [ -z "$1" ]; then
+    if [ -f /tmp/portainer.tar.gz ]; then
         echo "portainer/portainer was previously downloaded to /tmp/portainer.tar.gz, skipping..."
     else
         echo "Downloading image downloader from ${IMAGE_DOWNLOADER_URL}"
@@ -96,7 +96,7 @@ download_docker_images_from_inside_docker() {
 
 download_docker_images_from_outside_docker() {
     echo "Downloading portainer/portainer:latest from Docker Hub..."
-    if [ -f /tmp/portainer.tar.gz ] && [ -z "$1" ]; then
+    if [ -f /tmp/portainer.tar.gz ]; then
         echo "portainer/portainer was previously downloaded to /tmp/portainer.tar.gz, skipping..."
     else
         docker pull portainer/portainer && docker save --output /tmp/portainer.tar.gz portainer/portainer:latest
