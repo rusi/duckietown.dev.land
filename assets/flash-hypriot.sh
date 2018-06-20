@@ -28,10 +28,7 @@ if [ -z "$ETCHER_URL" ]; then
 fi
 
 install_deps() {
-    apt-get -y install wget tar lib32stdc++6 \
-               curl pv unzip hdparm sudo file udev \
-               golang-go \
-               --no-install-recommends
+    apt-get -y install wget tar lib32stdc++6 curl pv unzip hdparm sudo file udev golang-go --no-install-recommends
 }
 
 install_flasher() {
