@@ -137,35 +137,26 @@ read -p "Please enter a WIFI SSID (default is $DEFAULT_WIFISSID) > " WIFISSID
 WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
 read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
 
-LSBLK=$(lsblk -o name,mountpoint,label)
-if echo $LSBLK | grep -q HypriotOS; then
-    echo "$LSBLK\n"
-    while true; do
-        read -p "HypriotOS detected on existing device. Would you like to continue? (Y/N) > " REPLY
-        case $REPLY in
-            [yY] ) echo "Reinstalling HypriotOS..."; flash_hypriot; break;;
-            [nN] ) echo "Aborted Hypriot install."; exit; break;;
-        esac
-    done
-else flash_hypriot 
-fi
-
 write_duckieos_files() {
     echo "Configuring DuckieOS installation..." 
     # Preload image(s) to speed up first boot
-    ROOT_MOUNTPOINT=$(mktemp -d)
-    mount -L root $ROOT_MOUNTPOINT
     echo "Writing preloaded Docker images to /var/local/"
     cp /tmp/portainer.tar.gz $ROOT_MOUNTPOINT/var/local/
     # cp /tmp/software.tar.gz $ROOT_MOUNTPOINT/var/local/
+}
 
+write_configurations() {
     # Add i2c to boot configuration
     echo "dtparam=i2c1=on" >> $ROOT_MOUNTPOINT/boot/config.txt  
     echo "dtparam=i2c_arm=on" >> $ROOT_MOUNTPOINT/boot/config.txt 
     echo "i2c-bcm2708" >> $ROOT_MOUNTPOINT/etc/modules 
     echo "i2c-dev" >> $ROOT_MOUNTPOINT/etc/modules 
-    umount $ROOT_MOUNTPOINT
 }
+
+# TODO
+# write_ssh_keys() {
+#     cat ~/.ssh/id_rsa.pub $ROOT_MOUNTPOINT
+# }
 
 write_userdata() {
     echo "Writing custom cloud-init user-data..."
@@ -179,7 +170,12 @@ write_userdata() {
     echo "Installation complete! You may now remove the SD card."
 }
 
+
+ROOT_MOUNTPOINT=$(mktemp -d)
+mount -L root $ROOT_MOUNTPOINT
 write_duckieos_files
+write_configurations
+umount $ROOT_MOUNTPOINT
 
 USER_DATA=$(cat <<EOF
 #cloud-config
