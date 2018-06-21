@@ -160,10 +160,10 @@ write_duckieos_files() {
     # cp /tmp/software.tar.gz $ROOT_MOUNTPOINT/var/local/
 
     # Add i2c to boot configuration
-    echo "dtparam=i2c1=on" | tee -a $ROOT_MOUNTPOINT/boot/config.txt  
-    echo "dtparam=i2c_arm=on" | tee -a $ROOT_MOUNTPOINT/boot/config.txt 
-    echo "i2c-bcm2708" | tee -a $ROOT_MOUNTPOINT/etc/modules 
-    echo "i2c-dev" | tee -a $ROOT_MOUNTPOINT/etc/modules 
+    echo "dtparam=i2c1=on" >> $ROOT_MOUNTPOINT/boot/config.txt  
+    echo "dtparam=i2c_arm=on" >> $ROOT_MOUNTPOINT/boot/config.txt 
+    echo "i2c-bcm2708" >> $ROOT_MOUNTPOINT/etc/modules 
+    echo "i2c-dev" >> $ROOT_MOUNTPOINT/etc/modules 
     umount $ROOT_MOUNTPOINT
 }
 
@@ -252,11 +252,7 @@ runcmd:
 #  - [ docker, load, "--input", "/var/local/software.tar.gz"]
 
 # for convenience, we will install and start Portainer.io
-  - 'DIGEST=$(docker image inspect --format "{{(index .RepoDigests 0)}}" portainer/portainer) && 
-     docker service create --detach=false --name portainer 
-     --publish published=9000,target=9000,mode=host
-     --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock
-     $DIGEST -H unix:///var/run/docker.sock --no-auth'
+  - 'docker service create --detach=false --name portainer --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock $(docker image inspect --format "{{(index .RepoDigests 0)}}" portainer/portainer) -H unix:///var/run/docker.sock --no-auth'
 EOF
 )
 
