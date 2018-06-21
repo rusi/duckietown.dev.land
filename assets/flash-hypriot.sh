@@ -25,6 +25,8 @@ if [ -z "$ETCHER_URL" ]; then
 
     FLASH_URL="https://github.com/hypriot/flash/releases/download/2.1.1/flash"
     FLASH_LOCAL="/tmp/${FLASH_URL##*/}"
+    
+    DUCKIE_ART_URL="https://raw.githubusercontent.com/duckietown/Software/master/misc/duckie.art"
 fi
 
 install_deps() {
@@ -137,6 +139,8 @@ read -p "Please enter a WIFI SSID (default is $DEFAULT_WIFISSID) > " WIFISSID
 WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
 read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
 
+flash_hypriot
+
 write_duckieos_files() {
     echo "Configuring DuckieOS installation..." 
     # Preload image(s) to speed up first boot
@@ -151,6 +155,12 @@ write_configurations() {
     echo "dtparam=i2c_arm=on" >> $ROOT_MOUNTPOINT/boot/config.txt 
     echo "i2c-bcm2708" >> $ROOT_MOUNTPOINT/etc/modules 
     echo "i2c-dev" >> $ROOT_MOUNTPOINT/etc/modules 
+}
+
+write_motd() {
+    wget --no-check-certificate -O $ROOT_MOUNTPOINT/etc/update-motd.d/duckie.art $DUCKIE_ART_URL
+    printf '#!/bin/sh\nprintf "\\n$(cat /etc/update-motd.d/duckie.art)\\n"\n' > $ROOT_MOUNTPOINT/etc/update-motd.d/20-duckie
+    chmod +x $ROOT_MOUNTPOINT/etc/update-motd.d/20-duckie
 }
 
 # TODO
@@ -170,11 +180,11 @@ write_userdata() {
     echo "Installation complete! You may now remove the SD card."
 }
 
-
 ROOT_MOUNTPOINT=$(mktemp -d)
 mount -L root $ROOT_MOUNTPOINT
 write_duckieos_files
 write_configurations
+write_motd
 umount $ROOT_MOUNTPOINT
 
 USER_DATA=$(cat <<EOF
