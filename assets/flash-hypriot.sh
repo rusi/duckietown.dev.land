@@ -280,7 +280,7 @@ runcmd:
       "--name", "portainer",
       "--publish", "published=9000,target=9000,mode=host",
       "--mount", "type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock",
-      "portainer/portainer:arm", "-H", "unix:///var/run/docker.sock", "--no-auth"
+      "portainer/portainer:arm", "-H", "unix:///var/run/docker.sock"
     ]
 EOF
 )
