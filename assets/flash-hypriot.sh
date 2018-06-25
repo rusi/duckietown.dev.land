@@ -79,7 +79,7 @@ flash_hypriot() {
 download_docker_images_from_inside_docker() {
     echo "Downloading image downloader from ${IMAGE_DOWNLOADER_URL}"
     wget -cO ${IMAGE_DOWNLOADER_LOCAL} ${IMAGE_DOWNLOADER_URL} && chmod 777 ${IMAGE_DOWNLOADER_LOCAL}
-    mkdir /tmp/portainer /tmp/software
+    mkdir -p /tmp/portainer /tmp/software
 
     echo "Downloading portainer/portainer:latest from Docker Hub..."
     ${IMAGE_DOWNLOADER_LOCAL} /tmp/portainer portainer/portainer:latest
@@ -92,16 +92,16 @@ download_docker_images_from_inside_docker() {
     rm -rf /tmp/portainer /tmp/software
 }
 
-download_docker_images_from_outside_docker() {
-    echo "Downloading portainer/portainer:latest from Docker Hub..."
-    if [ -f /tmp/portainer.tar.gz ]; then
-        echo "portainer/portainer was previously downloaded to /tmp/portainer.tar.gz, skipping..."
-    else
-        docker pull portainer/portainer && docker save --output /tmp/portainer.tar.gz portainer/portainer:latest
-    fi
-    # echo "Downloading duckietown/software:latest from Docker Hub..."
-    # docker pull duckietown/software && docker save --output /tmp/software.tar.gz duckietown/software:latest
-}
+# download_docker_images_from_outside_docker() {
+#     echo "Downloading portainer/portainer:latest from Docker Hub..."
+#     if [ -f /tmp/portainer.tar.gz ]; then
+#         echo "portainer/portainer was previously downloaded to /tmp/portainer.tar.gz, skipping..."
+#     else
+#         docker pull portainer/portainer && docker save --output /tmp/portainer.tar.gz portainer/portainer:latest
+#     fi
+#     # echo "Downloading duckietown/software:latest from Docker Hub..."
+#     # docker pull duckietown/software && docker save --output /tmp/software.tar.gz duckietown/software:latest
+# }
 
 install_deps
 
@@ -109,13 +109,13 @@ install_flasher
 
 download_hypriot
 
-if [ -f /.dockerenv ]; then
-    echo "Docker container detected. Downloading image manually..."
-    download_docker_images_from_inside_docker
-else
-    echo "Linux detected. Downloading image with docker save..."
-    download_docker_images_from_outside_docker
-fi
+# if [ -f /.dockerenv ]; then
+#    echo "Docker container detected. Downloading image manually..."
+download_docker_images_from_inside_docker
+# else
+#     echo "Linux detected. Downloading image with docker save..."
+#     download_docker_images_from_outside_docker
+# fi
 
 if [ -n "$1" ]; then
     echo "Dependencies installed."; exit
@@ -141,7 +141,7 @@ read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
 
 flash_hypriot
 
-write_duckieos_files() {
+preload_docker_images() {
     echo "Configuring DuckieOS installation..." 
     # Preload image(s) to speed up first boot
     echo "Writing preloaded Docker images to /var/local/"
@@ -177,15 +177,17 @@ write_userdata() {
     echo "Un-mounting HypriotOS..."
     umount $HYPRIOT_MOUNTPOINT
 
-    echo "Installation complete! You may now remove the SD card."
+    echo "Finished preparing SD card. Please remove and insert into a Duckiebot."
 }
 
-ROOT_MOUNTPOINT=$(mktemp -d)
-mount -L root $ROOT_MOUNTPOINT
-write_duckieos_files
-write_configurations
-write_motd
-umount $ROOT_MOUNTPOINT
+write_custom_files() {
+    ROOT_MOUNTPOINT=$(mktemp -d)
+    mount -L root $ROOT_MOUNTPOINT
+    preload_docker_images
+    write_configurations
+    write_motd
+    umount $ROOT_MOUNTPOINT
+}
 
 USER_DATA=$(cat <<EOF
 #cloud-config
