@@ -31,6 +31,30 @@ if [ -z "$ETCHER_URL" ]; then
     PORTAINER_LOCAL=/tmp/portainer.tar.gz
 fi
 
+prompt_for_configs() {
+    if [ -n "$1" ]; then
+        echo "Dependencies installed."; exit
+    fi
+    
+    echo "Configuring DuckiebotOS (press ^C to cancel)..."
+    
+    DEFAULT_HOSTNAME="duckiebot"
+    DEFAULT_USERNAME="duckie"
+    DEFAULT_PASSWORD="quackquack"
+    DEFAULT_WIFISSID="duckietown"
+    DEFAULT_WIFIPASS="quackquack"
+    
+    read -p "Please enter a username (default is $DEFAULT_USERNAME) > " USERNAME
+    USERNAME=${USERNAME:-$DEFAULT_USERNAME}
+    read -p "Please enter a password (default is $DEFAULT_PASSWORD) > " PASSWORD
+    PASSWORD=${PASSWORD:-$DEFAULT_PASSWORD}
+    read -p "Please enter a hostname (default is $DEFAULT_HOSTNAME) > " HOSTNAME
+    HOSTNAME=${HOSTNAME:-$DEFAULT_HOSTNAME}
+    read -p "Please enter a WIFI SSID (default is $DEFAULT_WIFISSID) > " WIFISSID
+    WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
+    read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
+}
+
 install_deps() {
     apt-get -y install wget tar lib32stdc++6 curl pv unzip hdparm sudo file udev golang-go jq --no-install-recommends
 }
@@ -105,6 +129,8 @@ download_docker_images() {
 #     # docker pull duckietown/software && docker save --output /tmp/software.tar.gz duckietown/software:latest
 # }
 
+prompt_for_configs
+
 install_deps
 
 install_flasher
@@ -118,29 +144,6 @@ download_docker_images
 #     echo "Linux detected. Downloading image with docker save..."
 #     download_docker_images_from_outside_docker
 # fi
-
-if [ -n "$1" ]; then
-    echo "Dependencies installed."; exit
-fi
-
-echo "Configuring DuckiebotOS (press ^C to cancel)..."
-
-DEFAULT_HOSTNAME="duckiebot"
-DEFAULT_USERNAME="duckie"
-DEFAULT_PASSWORD="quackquack"
-DEFAULT_WIFISSID="duckietown"
-DEFAULT_WIFIPASS="quackquack"
-
-read -p "Please enter a username (default is $DEFAULT_USERNAME) > " USERNAME
-USERNAME=${USERNAME:-$DEFAULT_USERNAME}
-read -p "Please enter a password (default is $DEFAULT_PASSWORD) > " PASSWORD
-PASSWORD=${PASSWORD:-$DEFAULT_PASSWORD}
-read -p "Please enter a hostname (default is $DEFAULT_HOSTNAME) > " HOSTNAME
-HOSTNAME=${HOSTNAME:-$DEFAULT_HOSTNAME}
-read -p "Please enter a WIFI SSID (default is $DEFAULT_WIFISSID) > " WIFISSID
-WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
-read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
-
 flash_hypriot
 
 preload_docker_images() {
@@ -153,10 +156,10 @@ preload_docker_images() {
 
 write_configurations() {
     # Add i2c to boot configuration
-    echo "dtparam=i2c1=on" >> $ROOT_MOUNTPOINT/boot/config.txt  
-    echo "dtparam=i2c_arm=on" >> $ROOT_MOUNTPOINT/boot/config.txt 
-    echo "i2c-bcm2708" >> $ROOT_MOUNTPOINT/etc/modules 
-    echo "i2c-dev" >> $ROOT_MOUNTPOINT/etc/modules 
+    echo "dtparam=i2c1=on" >> $HYPRIOT_MOUNTPOINT/config.txt
+    echo "dtparam=i2c_arm=on" >> $HYPRIOT_MOUNTPOINT/config.txt
+    echo "i2c-bcm2708" >> $ROOT_MOUNTPOINT/etc/modules
+    echo "i2c-dev" >> $ROOT_MOUNTPOINT/etc/modules
 }
 
 write_motd() {
@@ -170,26 +173,35 @@ write_motd() {
 #     cat ~/.ssh/id_rsa.pub $ROOT_MOUNTPOINT
 # }
 
+mount_disks() {
+    HYPRIOT_MOUNTPOINT=$(mktemp -d)
+    ROOT_MOUNTPOINT=$(mktemp -d)
+    mount -L HypriotOS $HYPRIOT_MOUNTPOINT
+    mount -L root $ROOT_MOUNTPOINT
+}
+
+unmount_disks() {
+    umount $HYPRIOT_MOUNTPOINT
+    umount $ROOT_MOUNTPOINT
+}
+
 write_userdata() {
     echo "Writing custom cloud-init user-data..."
 
-    HYPRIOT_MOUNTPOINT=$(mktemp -d)
-    mount -L HypriotOS $HYPRIOT_MOUNTPOINT
     echo "$USER_DATA" > $HYPRIOT_MOUNTPOINT/user-data
     echo "Un-mounting HypriotOS..."
-    umount $HYPRIOT_MOUNTPOINT
-
+    unmount_disks
     echo "Finished preparing SD card. Please remove and insert into a Duckiebot."
 }
 
 write_custom_files() {
-    ROOT_MOUNTPOINT=$(mktemp -d)
-    mount -L root $ROOT_MOUNTPOINT
     preload_docker_images
     write_configurations
     write_motd
-    umount $ROOT_MOUNTPOINT
 }
+
+mount_disks
+write_custom_files
 
 USER_DATA=$(cat <<EOF
 #cloud-config
