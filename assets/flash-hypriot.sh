@@ -27,6 +27,8 @@ if [ -z "$ETCHER_URL" ]; then
     FLASH_LOCAL="/tmp/${FLASH_URL##*/}"
     
     DUCKIE_ART_URL="https://raw.githubusercontent.com/duckietown/Software/master/misc/duckie.art"
+
+    PORTAINER_LOCAL=/tmp/portainer.tar.gz
 fi
 
 install_deps() {
@@ -76,14 +78,14 @@ flash_hypriot() {
     echo "Flashing Hypriot image succeeded."
 }
 
-download_docker_images_from_inside_docker() {
+download_docker_images() {
     echo "Downloading image downloader from ${IMAGE_DOWNLOADER_URL}"
     wget -cO ${IMAGE_DOWNLOADER_LOCAL} ${IMAGE_DOWNLOADER_URL} && chmod 777 ${IMAGE_DOWNLOADER_LOCAL}
     mkdir -p /tmp/portainer /tmp/software
 
     echo "Downloading portainer/portainer:latest from Docker Hub..."
     ${IMAGE_DOWNLOADER_LOCAL} /tmp/portainer portainer/portainer:latest
-    tar -czvf /tmp/portainer.tar.gz /tmp/portainer/
+    tar -czvf ${PORTAINER_LOCAL} -C /tmp/portainer/ .
 
     # echo "Downloading duckietown/software:latest from Docker Hub..."
     # ${IMAGE_DOWNLOADER_LOCAL} /tmp/software duckietown/software:latest
@@ -111,7 +113,7 @@ download_hypriot
 
 # if [ -f /.dockerenv ]; then
 #    echo "Docker container detected. Downloading image manually..."
-download_docker_images_from_inside_docker
+download_docker_images
 # else
 #     echo "Linux detected. Downloading image with docker save..."
 #     download_docker_images_from_outside_docker
@@ -145,7 +147,7 @@ preload_docker_images() {
     echo "Configuring DuckieOS installation..." 
     # Preload image(s) to speed up first boot
     echo "Writing preloaded Docker images to /var/local/"
-    cp /tmp/portainer.tar.gz $ROOT_MOUNTPOINT/var/local/
+    cp ${PORTAINER_LOCAL} $ROOT_MOUNTPOINT/var/local/
     # cp /tmp/software.tar.gz $ROOT_MOUNTPOINT/var/local/
 }
 
