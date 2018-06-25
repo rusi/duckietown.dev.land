@@ -52,7 +52,8 @@ prompt_for_configs() {
     HOST_NAME=${HOST_NAME:-$DEFAULT_HOSTNAME}
     read -p "Please enter a WIFI SSID (default is $DEFAULT_WIFISSID) > " WIFISSID
     WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
-    read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
+    read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPASS
+    WIFIPASS=${WIFIPASS:-$DEFAULT_WIFIPASS}
 }
 
 install_deps() {
@@ -234,6 +235,7 @@ write_files:
       iface default inet dhcp
     path: /etc/network/interfaces.d/wlan0
   - content: |
+      country=CA
       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
       update_config=1
       network={
