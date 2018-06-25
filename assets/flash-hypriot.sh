@@ -48,8 +48,8 @@ prompt_for_configs() {
     USERNAME=${USERNAME:-$DEFAULT_USERNAME}
     read -p "Please enter a password (default is $DEFAULT_PASSWORD) > " PASSWORD
     PASSWORD=${PASSWORD:-$DEFAULT_PASSWORD}
-    read -p "Please enter a hostname (default is $DEFAULT_HOSTNAME) > " HOSTNAME
-    HOSTNAME=${HOSTNAME:-$DEFAULT_HOSTNAME}
+    read -p "Please enter a hostname (default is $DEFAULT_HOSTNAME) > " HOST_NAME
+    HOST_NAME=${HOST_NAME:-$DEFAULT_HOSTNAME}
     read -p "Please enter a WIFI SSID (default is $DEFAULT_WIFISSID) > " WIFISSID
     WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
     read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPSK
@@ -210,7 +210,7 @@ USER_DATA=$(cat <<EOF
 # The currently used version of cloud-init is 0.7.9
 # http://cloudinit.readthedocs.io/en/0.7.9/index.html
 
-hostname: $HOSTNAME
+hostname: $HOST_NAME
 manage_etc_hosts: true
 
 users:
@@ -274,14 +274,7 @@ runcmd:
 #  - [ docker, load, "--input", "/var/local/software.tar.gz"]
 
 # for convenience, we will install and start Portainer.io
-  - [
-      docker, service, create,
-      "--detach=false",
-      "--name", "portainer",
-      "--publish", "published=9000,target=9000,mode=host",
-      "--mount", "type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock",
-      "portainer/portainer:arm", "-H", "unix:///var/run/docker.sock"
-    ]
+  - 'docker service create --detach=false --name portainer --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer:arm -H unix:///var/run/docker.sock'
 EOF
 )
 
