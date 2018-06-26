@@ -157,12 +157,21 @@ write_motd() {
     chmod +x $ROOT_MOUNTPOINT/etc/update-motd.d/20-duckie
 }
 
-write_ssh_keys() {
+copy_ssh_credentials() {
     PUB_KEY=/home/$(logname)/.ssh/id_rsa.pub
     if [ -f $PUB_KEY ]; then
         echo "Writing $PUB_KEY to $ROOT_MOUNTPOINT/home/$USERNAME/.ssh/authorized_keys"
         mkdir -p $ROOT_MOUNTPOINT/home/$USERNAME/.ssh
         cat $PUB_KEY > $ROOT_MOUNTPOINT/home/$USERNAME/.ssh/authorized_keys
+    fi
+}
+
+copy_docker_credentials() {
+    DOCKER_DIR=/home/$(logname)/.docker
+    if [ -d $DOCKER_DIR]; then
+        echo "Writing $DOCKER_DIR to $ROOT_MOUNTPOINT/home/$USERNAME"
+        mkdir -p $ROOT_MOUNTPOINT/home/$USERNAME
+        cp -r $DOCKER_DIR $ROOT_MOUNTPOINT/home/$USERNAME/
     fi
 }
 
@@ -181,7 +190,8 @@ unmount_disks() {
 write_custom_files() {
     mount_disks
     preload_docker_images
-    write_ssh_keys
+    copy_ssh_credentials
+    # copy_docker_credentials
     write_configurations
     write_motd
 }
@@ -263,13 +273,14 @@ runcmd:
   - [ systemctl, start, --no-block, docker-tcp.socket ]
   - [ systemctl, start, --no-block, docker ]
   - [ docker, swarm, init ]
-  - [ docker, load, "--input", "/var/local/portainer.tar.gz"]
+  - [ docker, load, "--input", "/var/local/portainer.tar.gz" ]
 # Disabled pre-loading duckietown/software due to insuffient space on /var/local
 # https://github.com/hypriot/image-builder-rpi/issues/244#issuecomment-390512469
 #  - [ docker, load, "--input", "/var/local/software.tar.gz"]
 
 # for convenience, we will install and start Portainer.io
   - 'docker service create --detach=false --name portainer --quiet --no-resolve-image --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer:linux-arm -H unix:///var/run/docker.sock --no-auth'
+  - [ docker, pull, "duckietown/software" ]
 EOF
 )
 
