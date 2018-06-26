@@ -57,7 +57,7 @@ prompt_for_configs() {
 }
 
 install_deps() {
-    apt-get -y install wget tar lib32stdc++6 curl pv unzip hdparm sudo file udev golang-go jq --no-install-recommends
+    apt-get -yqq install wget tar lib32stdc++6 curl pv unzip hdparm sudo file udev golang-go jq --no-install-recommends
 }
 
 install_flasher() {
@@ -108,9 +108,13 @@ download_docker_images() {
     wget -cO ${IMAGE_DOWNLOADER_LOCAL} ${IMAGE_DOWNLOADER_URL} && chmod 777 ${IMAGE_DOWNLOADER_LOCAL}
     mkdir -p /tmp/portainer /tmp/software
 
-    echo "Downloading portainer/portainer:linux-arm from Docker Hub..."
-    ${IMAGE_DOWNLOADER_LOCAL} /tmp/portainer portainer/portainer:linux-arm
-    tar -czvf ${PORTAINER_LOCAL} -C /tmp/portainer/ .
+    if [ -f /tmp/portainer.tar.gz ]; then
+        echo "portainer/portainer:linux-arm was previously downloaded to /tmp/portainer.tar.gz, skipping..."
+    else
+        echo "Downloading portainer/portainer:linux-arm from Docker Hub..."
+        ${IMAGE_DOWNLOADER_LOCAL} /tmp/portainer portainer/portainer:linux-arm
+        tar -czvf ${PORTAINER_LOCAL} -C /tmp/portainer/ .
+    fi
 
     # echo "Downloading duckietown/software:latest from Docker Hub..."
     # ${IMAGE_DOWNLOADER_LOCAL} /tmp/software duckietown/software:latest
@@ -118,17 +122,6 @@ download_docker_images() {
 
     rm -rf /tmp/portainer /tmp/software
 }
-
-# download_docker_images_from_outside_docker() {
-#     echo "Downloading portainer/portainer:latest from Docker Hub..."
-#     if [ -f /tmp/portainer.tar.gz ]; then
-#         echo "portainer/portainer was previously downloaded to /tmp/portainer.tar.gz, skipping..."
-#     else
-#         docker pull portainer/portainer && docker save --output /tmp/portainer.tar.gz portainer/portainer:latest
-#     fi
-#     # echo "Downloading duckietown/software:latest from Docker Hub..."
-#     # docker pull duckietown/software && docker save --output /tmp/software.tar.gz duckietown/software:latest
-# }
 
 prompt_for_configs
 
@@ -138,13 +131,8 @@ install_flasher
 
 download_hypriot
 
-# if [ -f /.dockerenv ]; then
-#    echo "Docker container detected. Downloading image manually..."
 download_docker_images
-# else
-#     echo "Linux detected. Downloading image with docker save..."
-#     download_docker_images_from_outside_docker
-# fi
+
 flash_hypriot
 
 preload_docker_images() {
@@ -169,21 +157,33 @@ write_motd() {
     chmod +x $ROOT_MOUNTPOINT/etc/update-motd.d/20-duckie
 }
 
-# TODO
-# write_ssh_keys() {
-#     cat ~/.ssh/id_rsa.pub $ROOT_MOUNTPOINT
-# }
+write_ssh_keys() {
+    PUB_KEY=/home/$(logname)/.ssh/id_rsa.pub
+    if [ -f $PUB_KEY ]; then
+        echo "Writing $PUB_KEY to $ROOT_MOUNTPOINT/home/$USERNAME/.ssh/authorized_keys"
+        mkdir -p $ROOT_MOUNTPOINT/home/$USERNAME/.ssh
+        cat $PUB_KEY > $ROOT_MOUNTPOINT/home/$USERNAME/.ssh/authorized_keys
+    fi
+}
 
 mount_disks() {
-    HYPRIOT_MOUNTPOINT=$(mktemp -d)
     ROOT_MOUNTPOINT=$(mktemp -d)
-    mount -L HypriotOS $HYPRIOT_MOUNTPOINT
-    mount -L root $ROOT_MOUNTPOINT
+    HYPRIOT_MOUNTPOINT=$(mktemp -d)
+    mount -L "root" $ROOT_MOUNTPOINT
+    mount -L "HypriotOS" $HYPRIOT_MOUNTPOINT
 }
 
 unmount_disks() {
-    umount $HYPRIOT_MOUNTPOINT
     umount $ROOT_MOUNTPOINT
+    umount $HYPRIOT_MOUNTPOINT
+}
+
+write_custom_files() {
+    mount_disks
+    preload_docker_images
+    write_ssh_keys
+    write_configurations
+    write_motd
 }
 
 write_userdata() {
@@ -195,13 +195,6 @@ write_userdata() {
     echo "Finished preparing SD card. Please remove and insert into a Duckiebot."
 }
 
-write_custom_files() {
-    preload_docker_images
-    write_configurations
-    write_motd
-}
-
-mount_disks
 write_custom_files
 
 USER_DATA=$(cat <<EOF
