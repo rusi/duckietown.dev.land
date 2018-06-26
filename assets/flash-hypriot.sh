@@ -271,9 +271,8 @@ runcmd:
 # for convenience, we will install and start Portainer.io
    - [
        docker, service, create,
-       "--detach=false",
-       "--name", "portainer", "--no-resolve-image",
        "--publish", "published=9000,target=9000,mode=host",
+       "--name", "portainer", "--no-resolve-image", "--quiet", "--detach=false",
        "--mount", "type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock",
        "portainer/portainer:linux-arm", "-H", "unix:///var/run/docker.sock", "--no-auth"
      ]
