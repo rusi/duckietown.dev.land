@@ -108,8 +108,8 @@ download_docker_images() {
     wget -cO ${IMAGE_DOWNLOADER_LOCAL} ${IMAGE_DOWNLOADER_URL} && chmod 777 ${IMAGE_DOWNLOADER_LOCAL}
     mkdir -p /tmp/portainer /tmp/software
 
-    echo "Downloading portainer/portainer:arm from Docker Hub..."
-    ${IMAGE_DOWNLOADER_LOCAL} /tmp/portainer portainer/portainer:arm
+    echo "Downloading portainer/portainer:linux-arm from Docker Hub..."
+    ${IMAGE_DOWNLOADER_LOCAL} /tmp/portainer portainer/portainer:linux-arm
     tar -czvf ${PORTAINER_LOCAL} -C /tmp/portainer/ .
 
     # echo "Downloading duckietown/software:latest from Docker Hub..."
@@ -276,7 +276,7 @@ runcmd:
 #  - [ docker, load, "--input", "/var/local/software.tar.gz"]
 
 # for convenience, we will install and start Portainer.io
-  - 'docker service create --detach=false --name portainer --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer -H unix:///var/run/docker.sock'
+  - 'docker service create --detach=false --name portainer --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer:linux-arm -H unix:///var/run/docker.sock --no-auth'
 EOF
 )
 
