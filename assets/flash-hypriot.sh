@@ -269,13 +269,7 @@ runcmd:
 #  - [ docker, load, "--input", "/var/local/software.tar.gz"]
 
 # for convenience, we will install and start Portainer.io
-   - [
-       docker, service, create,
-       "--publish", "published=9000,target=9000,mode=host",
-       "--name", "portainer", "--no-resolve-image", "--quiet", "--detach=false",
-       "--mount", "type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock",
-       "portainer/portainer:linux-arm", "-H", "unix:///var/run/docker.sock", "--no-auth"
-     ]
+  - 'docker service create --detach=false --name portainer --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer:linux-arm -H unix:///var/run/docker.sock --no-auth --quiet --no-resolve-image'
 EOF
 )
 
