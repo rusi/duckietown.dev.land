@@ -261,7 +261,8 @@ runcmd:
 #  - [ docker, load, "--input", "/var/local/software.tar.gz"]
 
 # for convenience, we will install and start Portainer.io
-   - 'docker service create --detach=false --name portainer --quiet --no-resolve-image --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer:linux-arm -H unix:///var/run/docker.sock --no-auth'
+  - 'docker service create --detach=false --name portainer --quiet --no-resolve-image --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer:linux-arm -H unix:///var/run/docker.sock --no-auth'
+
 EOF
 )
     echo "$USER_DATA" > $TMP_HYPRIOT_MOUNTPOINT/user-data
