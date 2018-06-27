@@ -1,41 +1,53 @@
 #!/bin/bash
 
-set -e
+#for debutting, enable command printout
+if [ -n "$DEBUG" ]; then
+    set -x
+fi
 
+set -eu
 # We need root to install
-if [ $(id -u) != "0" ]; then
-    echo "Please provide root access or press ^C..."
-    exec sudo "$0" "$@"
+if [ $(id -u) -eq "0" ]; then
+    echo "Please, do not run this script as SUDO or root ^C..."
+    echo "The script requires SUDO/root access for flashing the image "
+    echo "and to write config files to HyrpiotOS."
+    echo "You will be asked for your password at that time."
+    exit 1
 fi
 
-if [ -z "$ETCHER_URL" ]; then
-    echo "Setting environment variables..."
-    ETCHER_URL="https://github.com/resin-io/etcher/releases/download/v1.4.4/etcher-cli-1.4.4-linux-x86.tar.gz"
-    ETCHER_DIR="/tmp/etcher-cli"
-    ETCHER_LOCAL=$(mktemp)
-    
-    HYPRIOT_URL="https://github.com/hypriot/image-builder-rpi/releases/download/v1.9.0/hypriotos-rpi-v1.9.0.img.zip"
-    HYPRIOT_LOCAL="/tmp/${HYPRIOT_URL##*/}"
+DEPS_LIST=(wget tar udisksctl docker) # lib32stdc++6 curl pv unzip hdparm sudo file udev golang-go jq)
 
-    IMAGE_DOWNLOADER_URL="https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh"
-    IMAGE_DOWNLOADER_LOCAL="/tmp/${IMAGE_DOWNLOADER_URL##*/}"
+TMP_DIR="/tmp/duckietown"
+mkdir -p ${TMP_DIR}
 
-    FLASHER_URL="https://raw.githubusercontent.com/rusi/duckietown.dev.land/master/assets/flash-hypriot.sh"
-    FLASHER_LOCAL="/tmp/${FLASHER_URL##*/}"
+MOD_FILE="${TMP_DIR}/mod"
 
-    FLASH_URL="https://github.com/hypriot/flash/releases/download/2.1.1/flash"
-    FLASH_LOCAL="/tmp/${FLASH_URL##*/}"
-    
-    DUCKIE_ART_URL="https://raw.githubusercontent.com/duckietown/Software/master/misc/duckie.art"
+ETCHER_URL="https://github.com/resin-io/etcher/releases/download/v1.4.4/etcher-cli-1.4.4-linux-x86.tar.gz"
+ETCHER_DIR="${TMP_DIR}/etcher-cli"
+TMP_ETCHER_LOCAL=$(mktemp -p ${TMP_DIR})
 
-    PORTAINER_LOCAL=/tmp/portainer.tar.gz
-fi
+HYPRIOT_URL="https://github.com/hypriot/image-builder-rpi/releases/download/v1.9.0/hypriotos-rpi-v1.9.0.img.zip"
+HYPRIOT_LOCAL="${TMP_DIR}/${HYPRIOT_URL##*/}"
+
+IMAGE_DOWNLOADER_CACHEDIR="${TMP_DIR}/docker_images"
+mkdir -p ${IMAGE_DOWNLOADER_CACHEDIR}
+# IMAGE_DOWNLOADER_URL="https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh"
+# IMAGE_DOWNLOADER_LOCAL="${TMP_DIR}/${IMAGE_DOWNLOADER_URL##*/}"
+
+# FLASHER_URL="https://raw.githubusercontent.com/rusi/duckietown.dev.land/master/assets/flash-hypriot.sh"
+# FLASHER_LOCAL="${TMP_DIR}/${FLASHER_URL##*/}"
+
+# FLASH_URL="https://github.com/hypriot/flash/releases/download/2.1.1/flash"
+# FLASH_LOCAL="${TMP_DIR}/${FLASH_URL##*/}"
+
+DUCKIE_ART_URL="https://raw.githubusercontent.com/duckietown/Software/master/misc/duckie.art"
+
+declare -A PRELOADED_DOCKER_IMAGES=( \
+    ["portainer"]="portainer/portainer:linux-arm" \
+    # ["duckietown"]="duckietown/software:latest" \
+)
 
 prompt_for_configs() {
-    if [ -n "$1" ]; then
-        echo "Dependencies installed."; exit
-    fi
-    
     echo "Configuring DuckiebotOS (press ^C to cancel)..."
     
     DEFAULT_HOSTNAME="duckiebot"
@@ -56,31 +68,53 @@ prompt_for_configs() {
     WIFIPASS=${WIFIPASS:-$DEFAULT_WIFIPASS}
 }
 
-install_deps() {
-    apt-get -yqq install wget tar lib32stdc++6 curl pv unzip hdparm sudo file udev golang-go jq --no-install-recommends
+check_deps() {
+    missing_deps=()
+    for dep in ${DEPS_LIST[@]}; do
+        if [ ! $(command -v ${dep}) ]; then
+            missing_deps+=("${dep}")
+        fi
+    done
+    if [ ${#missing_deps[@]} -ne 0 ]; then
+        echo "The following dependencies are missing. Please install corresponding packages for:"
+        echo "${missing_deps[@]}"
+        [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+    fi
 }
 
-install_flasher() {
+# install_deps() {
+#     echo "*** The following dependencies are needed and will be installed next."
+#     echo "    ${DEPS_LIST}"
+#     read -p "Would you like to proceed? [Y/N] " -n 1 -r
+#     echo    # (optional) move to a new line
+#     if [[ ! $REPLY =~ ^[Yy]$ ]]
+#     then
+#         [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+#     fi
+#     apt-get -yqq install ${DEPS_LIST} --no-install-recommends
+# }
+
+download_etcher() {
     if [ -f "$ETCHER_DIR/etcher" ]; then
         echo "Prior etcher-cli install detected at $ETCHER_DIR, skipping..."
     else
         # Download tool to burn image
         echo "Downloading etcher-cli..."
-        wget -cO "${ETCHER_LOCAL}" "${ETCHER_URL}"
+        wget -cO "${TMP_ETCHER_LOCAL}" "${ETCHER_URL}"
         
         # Unpack archive
         echo "Installing etcher-cli to $ETCHER_DIR..."
-        mkdir $ETCHER_DIR && tar fvx ${ETCHER_LOCAL} -C ${ETCHER_DIR} --strip-components=1
+        mkdir -p $ETCHER_DIR && tar fvx ${TMP_ETCHER_LOCAL} -C ${ETCHER_DIR} --strip-components=1
     fi
    
-    if [ -f $FLASH_LOCAL ]; then
-        echo "hypriot/flash was previously downloaded to $FLASH_LOCAL, skipping..."
-    else
-        echo "Installing hypriot/flash to $FLASH_LOCAL..."
-        wget -cO ${FLASH_LOCAL} ${FLASH_URL} && chmod 777 ${FLASH_LOCAL}
-    fi
+    # if [ -f $FLASH_LOCAL ]; then
+    #     echo "hypriot/flash was previously downloaded to $FLASH_LOCAL, skipping..."
+    # else
+    #     echo "Installing hypriot/flash to $FLASH_LOCAL..."
+    #     wget -cO ${FLASH_LOCAL} ${FLASH_URL} && chmod 777 ${FLASH_LOCAL}
+    # fi
 
-    rm -rf ${ETCHER_LOCAL}
+    rm -rf ${TMP_ETCHER_LOCAL}
 }
 
 download_hypriot() {
@@ -95,119 +129,126 @@ download_hypriot() {
 
 flash_hypriot() {
     echo "Flashing Hypriot image $HYPRIOT_LOCAL to disk..."
-    if [ -f /.dockerenv ]; then
-        ${FLASH_LOCAL} ${HYPRIOT_LOCAL}
-    else
-        ${ETCHER_DIR}/etcher ${HYPRIOT_LOCAL}
-    fi
+    # if [ -f /.dockerenv ]; then
+    #     ${FLASH_LOCAL} ${HYPRIOT_LOCAL}
+    # else
+        sudo -p "[sudo] Enter password for '%p' which is required to run Etcher: " \
+            ${ETCHER_DIR}/etcher -u false ${HYPRIOT_LOCAL}
+        # sudo -k  # we need sudo later on to write config files
+    # fi
     echo "Flashing Hypriot image succeeded."
 }
 
-download_docker_images() {
-    echo "Downloading image downloader from ${IMAGE_DOWNLOADER_URL}"
-    wget -cO ${IMAGE_DOWNLOADER_LOCAL} ${IMAGE_DOWNLOADER_URL} && chmod 777 ${IMAGE_DOWNLOADER_LOCAL}
-    mkdir -p /tmp/portainer /tmp/software
+# download_docker_image() {
+#     image_name="$1"
+#     docker_tag="$2"
+#     image_filename="${IMAGE_DOWNLOADER_CACHEDIR}/${image_name}.tar.gz"
+#     image_cachedir="${IMAGE_DOWNLOADER_CACHEDIR}/${image_name}"
 
-    if [ -f /tmp/portainer.tar.gz ]; then
-        echo "portainer/portainer:linux-arm was previously downloaded to /tmp/portainer.tar.gz, skipping..."
+#     mkdir -p ${image_cachedir}
+
+#     # download the script used to download docker images
+#     if [ ! -f ${IMAGE_DOWNLOADER_LOCAL} ]; then
+#         echo "Downloading image downloader from ${IMAGE_DOWNLOADER_URL}"
+#         wget -cO ${IMAGE_DOWNLOADER_LOCAL} ${IMAGE_DOWNLOADER_URL} && chmod 777 ${IMAGE_DOWNLOADER_LOCAL}
+#     fi
+    
+#     # download docker image if it doesn't exist
+#     if [ -f ${image_filename} ]; then
+#         echo "${docker_tag} was previously downloaded to ${image_filename}, skipping..."
+#     else
+#         echo "Downloading ${docker_tag} from Docker Hub..."
+#         ${IMAGE_DOWNLOADER_LOCAL} ${image_cachedir} ${docker_tag}
+#         tar -czvf ${image_filename} -C ${image_cachedir} .
+#     fi
+# }
+
+download_docker_image() {
+    image_name="$1"
+    docker_tag="$2"
+    image_filename="${IMAGE_DOWNLOADER_CACHEDIR}/${image_name}.tar.gz"
+
+    # download docker image if it doesn't exist
+    if [ -f ${image_filename} ]; then
+        echo "${docker_tag} was previously downloaded to ${image_filename}, skipping..."
     else
-        echo "Downloading portainer/portainer:linux-arm from Docker Hub..."
-        ${IMAGE_DOWNLOADER_LOCAL} /tmp/portainer portainer/portainer:linux-arm
-        tar -czvf ${PORTAINER_LOCAL} -C /tmp/portainer/ .
+        echo "Downloading ${docker_tag} from Docker Hub..."
+        docker pull ${docker_tag} && docker save --output ${image_filename} ${docker_tag}
     fi
-
-    # echo "Downloading duckietown/software:latest from Docker Hub..."
-    # ${IMAGE_DOWNLOADER_LOCAL} /tmp/software duckietown/software:latest
-    # tar -czvf /tmp/software.tar.gz /tmp/software/
-
-    rm -rf /tmp/portainer /tmp/software
 }
 
-prompt_for_configs
+download_docker_images() {
+    for image_name in "${!PRELOADED_DOCKER_IMAGES[@]}"; do
+        docker_tag=${PRELOADED_DOCKER_IMAGES[$image_name]}
+        download_docker_image ${image_name} ${docker_tag}
+    done
+}
 
-install_deps
-
-install_flasher
-
-download_hypriot
-
-download_docker_images
-
-flash_hypriot
-
+# todo - move this in the cloud-init payload
 preload_docker_images() {
     echo "Configuring DuckieOS installation..." 
     # Preload image(s) to speed up first boot
     echo "Writing preloaded Docker images to /var/local/"
-    cp ${PORTAINER_LOCAL} $ROOT_MOUNTPOINT/var/local/
-    # cp /tmp/software.tar.gz $ROOT_MOUNTPOINT/var/local/
+    for image_name in "${!PRELOADED_DOCKER_IMAGES[@]}"; do
+        docker_tag=${PRELOADED_DOCKER_IMAGES[$image_name]}
+        image_filename="${IMAGE_DOWNLOADER_CACHEDIR}/${image_name}.tar.gz"
+        sudo cp ${image_filename} $TMP_ROOT_MOUNTPOINT/var/local/
+    done
 }
 
 write_configurations() {
     # Add i2c to boot configuration
-    echo "dtparam=i2c1=on" >> $HYPRIOT_MOUNTPOINT/config.txt
-    echo "dtparam=i2c_arm=on" >> $HYPRIOT_MOUNTPOINT/config.txt
-    echo "i2c-bcm2708" >> $ROOT_MOUNTPOINT/etc/modules
-    echo "i2c-dev" >> $ROOT_MOUNTPOINT/etc/modules
+    echo "dtparam=i2c1=on" >> $TMP_HYPRIOT_MOUNTPOINT/config.txt
+    echo "dtparam=i2c_arm=on" >> $TMP_HYPRIOT_MOUNTPOINT/config.txt
 }
 
 write_motd() {
-    wget --no-check-certificate -O $ROOT_MOUNTPOINT/etc/update-motd.d/duckie.art $DUCKIE_ART_URL
-    printf '#!/bin/sh\nprintf "\\n$(cat /etc/update-motd.d/duckie.art)\\n"\n' > $ROOT_MOUNTPOINT/etc/update-motd.d/20-duckie
-    chmod +x $ROOT_MOUNTPOINT/etc/update-motd.d/20-duckie
+    # todo: check if the file on the server changed
+    if [ ! -f $MOD_FILE ]; then
+        echo "Downloading Message Of the Day"
+        wget --no-check-certificate -O $MOD_FILE $DUCKIE_ART_URL
+    fi
+    sudo cp $MOD_FILE $TMP_ROOT_MOUNTPOINT/etc/update-motd.d/duckie.art
+    printf '#!/bin/sh\nprintf "\\n$(cat /etc/update-motd.d/duckie.art)\\n"\n' | sudo tee -a $TMP_ROOT_MOUNTPOINT/etc/update-motd.d/20-duckie > /dev/null
+    sudo chmod +x $TMP_ROOT_MOUNTPOINT/etc/update-motd.d/20-duckie
 }
 
+# todo - move this in the cloud-init payload
 copy_ssh_credentials() {
-    PUB_KEY=/home/$(logname)/.ssh/id_rsa.pub
+    PUB_KEY=/home/${USER}/.ssh/id_rsa.pub
     if [ -f $PUB_KEY ]; then
-        echo "Writing $PUB_KEY to $ROOT_MOUNTPOINT/home/$USERNAME/.ssh/authorized_keys"
-        mkdir -p $ROOT_MOUNTPOINT/home/$USERNAME/.ssh
-        cat $PUB_KEY > $ROOT_MOUNTPOINT/home/$USERNAME/.ssh/authorized_keys
+        echo "Writing $PUB_KEY to $TMP_ROOT_MOUNTPOINT/home/$USERNAME/.ssh/authorized_keys"
+        sudo mkdir -p $TMP_ROOT_MOUNTPOINT/home/$USERNAME/.ssh
+        cat $PUB_KEY | sudo tee -a $TMP_ROOT_MOUNTPOINT/home/$USERNAME/.ssh/authorized_keys > /dev/null
     fi
 }
 
-copy_docker_credentials() {
-    DOCKER_DIR=/home/$(logname)/.docker
-    if [ -d $DOCKER_DIR]; then
-        echo "Writing $DOCKER_DIR to $ROOT_MOUNTPOINT/home/$USERNAME"
-        mkdir -p $ROOT_MOUNTPOINT/home/$USERNAME
-        cp -r $DOCKER_DIR $ROOT_MOUNTPOINT/home/$USERNAME/
-    fi
-}
+# copy_docker_credentials() {
+#     DOCKER_DIR=/home/${USER}/.docker
+#     if [ -d $DOCKER_DIR]; then
+#         echo "Writing $DOCKER_DIR to $TMP_ROOT_MOUNTPOINT/home/$USERNAME"
+#         mkdir -p $TMP_ROOT_MOUNTPOINT/home/$USERNAME
+#         cp -r $DOCKER_DIR $TMP_ROOT_MOUNTPOINT/home/$USERNAME/
+#     fi
+# }
 
 mount_disks() {
-    ROOT_MOUNTPOINT=$(mktemp -d)
-    HYPRIOT_MOUNTPOINT=$(mktemp -d)
-    mount -L "root" $ROOT_MOUNTPOINT
-    mount -L "HypriotOS" $HYPRIOT_MOUNTPOINT
+    #wait 1 second for the /dev/disk/by-label to be refreshed
+    sleep 1s
+    TMP_ROOT_MOUNTPOINT="/media/$USER/root"
+    TMP_HYPRIOT_MOUNTPOINT="/media/$USER/HypriotOS"
+    udisksctl mount -b /dev/disk/by-label/HypriotOS
+    udisksctl mount -b /dev/disk/by-label/root
 }
 
 unmount_disks() {
-    umount $ROOT_MOUNTPOINT
-    umount $HYPRIOT_MOUNTPOINT
-}
-
-write_custom_files() {
-    mount_disks
-    preload_docker_images
-    copy_ssh_credentials
-    # copy_docker_credentials
-    write_configurations
-    write_motd
+    udisksctl unmount -b /dev/disk/by-label/HypriotOS
+    udisksctl unmount -b /dev/disk/by-label/root
 }
 
 write_userdata() {
     echo "Writing custom cloud-init user-data..."
-
-    echo "$USER_DATA" > $HYPRIOT_MOUNTPOINT/user-data
-    echo "Un-mounting HypriotOS..."
-    unmount_disks
-    echo "Finished preparing SD card. Please remove and insert into a Duckiebot."
-}
-
-write_custom_files
-
-USER_DATA=$(cat <<EOF
+    USER_DATA=$(cat <<EOF
 #cloud-config
 # vim: syntax=yaml
 
@@ -251,6 +292,10 @@ write_files:
       }
     path: /etc/wpa_supplicant/wpa_supplicant.conf
   - content: |
+        i2c-bcm2708
+        i2c-dev
+    path: /etc/modules
+  - content: |
       [Unit]
       Description=Docker Socket for the API
 
@@ -267,6 +312,8 @@ write_files:
 runcmd:
   - 'systemctl restart avahi-daemon'
   - 'mkdir /data && chown 1000:1000 /data'
+#   - [ modprobe, i2c-bcm2708 ]
+#   - [ modprobe, i2c-dev ]
   - [ systemctl, stop, docker ]
   - [ systemctl, daemon-reload ]
   - [ systemctl, enable, docker-tcp.socket ]
@@ -279,9 +326,39 @@ runcmd:
 #  - [ docker, load, "--input", "/var/local/software.tar.gz"]
 
 # for convenience, we will install and start Portainer.io
-  - 'docker service create --detach=false --name portainer --quiet --no-resolve-image --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer:linux-arm -H unix:///var/run/docker.sock --no-auth'
-  - [ docker, pull, "duckietown/software" ]
+   - 'docker service create --detach=false --name portainer --quiet --no-resolve-image --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer:linux-arm -H unix:///var/run/docker.sock --no-auth'
 EOF
 )
+    echo "$USER_DATA" > $TMP_HYPRIOT_MOUNTPOINT/user-data
+}
 
-write_userdata
+
+# main()
+
+# configs
+check_deps
+prompt_for_configs
+# install_deps
+
+# downloads
+download_etcher
+download_hypriot
+download_docker_images
+
+# flash
+flash_hypriot
+
+#write_custom_files
+mount_disks
+    preload_docker_images
+    copy_ssh_credentials
+    # copy_docker_credentials
+    write_configurations
+    write_motd
+    write_userdata
+    sync  # flush all buffers
+unmount_disks
+
+echo "Finished preparing SD card. Please remove and insert into a Duckiebot."
+
+#end main()
