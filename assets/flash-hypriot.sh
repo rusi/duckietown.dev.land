@@ -31,14 +31,6 @@ HYPRIOT_LOCAL="${TMP_DIR}/${HYPRIOT_URL##*/}"
 
 IMAGE_DOWNLOADER_CACHEDIR="${TMP_DIR}/docker_images"
 mkdir -p ${IMAGE_DOWNLOADER_CACHEDIR}
-# IMAGE_DOWNLOADER_URL="https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh"
-# IMAGE_DOWNLOADER_LOCAL="${TMP_DIR}/${IMAGE_DOWNLOADER_URL##*/}"
-
-# FLASHER_URL="https://raw.githubusercontent.com/rusi/duckietown.dev.land/master/assets/flash-hypriot.sh"
-# FLASHER_LOCAL="${TMP_DIR}/${FLASHER_URL##*/}"
-
-# FLASH_URL="https://github.com/hypriot/flash/releases/download/2.1.1/flash"
-# FLASH_LOCAL="${TMP_DIR}/${FLASH_URL##*/}"
 
 DUCKIE_ART_URL="https://raw.githubusercontent.com/duckietown/Software/master/misc/duckie.art"
 
@@ -82,18 +74,6 @@ check_deps() {
     fi
 }
 
-# install_deps() {
-#     echo "*** The following dependencies are needed and will be installed next."
-#     echo "    ${DEPS_LIST}"
-#     read -p "Would you like to proceed? [Y/N] " -n 1 -r
-#     echo    # (optional) move to a new line
-#     if [[ ! $REPLY =~ ^[Yy]$ ]]
-#     then
-#         [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
-#     fi
-#     apt-get -yqq install ${DEPS_LIST} --no-install-recommends
-# }
-
 download_etcher() {
     if [ -f "$ETCHER_DIR/etcher" ]; then
         echo "Prior etcher-cli install detected at $ETCHER_DIR, skipping..."
@@ -107,13 +87,6 @@ download_etcher() {
         mkdir -p $ETCHER_DIR && tar fvx ${TMP_ETCHER_LOCAL} -C ${ETCHER_DIR} --strip-components=1
     fi
    
-    # if [ -f $FLASH_LOCAL ]; then
-    #     echo "hypriot/flash was previously downloaded to $FLASH_LOCAL, skipping..."
-    # else
-    #     echo "Installing hypriot/flash to $FLASH_LOCAL..."
-    #     wget -cO ${FLASH_LOCAL} ${FLASH_URL} && chmod 777 ${FLASH_LOCAL}
-    # fi
-
     rm -rf ${TMP_ETCHER_LOCAL}
 }
 
@@ -129,39 +102,10 @@ download_hypriot() {
 
 flash_hypriot() {
     echo "Flashing Hypriot image $HYPRIOT_LOCAL to disk..."
-    # if [ -f /.dockerenv ]; then
-    #     ${FLASH_LOCAL} ${HYPRIOT_LOCAL}
-    # else
-        sudo -p "[sudo] Enter password for '%p' which is required to run Etcher: " \
-            ${ETCHER_DIR}/etcher -u false ${HYPRIOT_LOCAL}
-        # sudo -k  # we need sudo later on to write config files
-    # fi
+    sudo -p "[sudo] Enter password for '%p' which is required to run Etcher: " \
+        ${ETCHER_DIR}/etcher -u false ${HYPRIOT_LOCAL}
     echo "Flashing Hypriot image succeeded."
 }
-
-# download_docker_image() {
-#     image_name="$1"
-#     docker_tag="$2"
-#     image_filename="${IMAGE_DOWNLOADER_CACHEDIR}/${image_name}.tar.gz"
-#     image_cachedir="${IMAGE_DOWNLOADER_CACHEDIR}/${image_name}"
-
-#     mkdir -p ${image_cachedir}
-
-#     # download the script used to download docker images
-#     if [ ! -f ${IMAGE_DOWNLOADER_LOCAL} ]; then
-#         echo "Downloading image downloader from ${IMAGE_DOWNLOADER_URL}"
-#         wget -cO ${IMAGE_DOWNLOADER_LOCAL} ${IMAGE_DOWNLOADER_URL} && chmod 777 ${IMAGE_DOWNLOADER_LOCAL}
-#     fi
-    
-#     # download docker image if it doesn't exist
-#     if [ -f ${image_filename} ]; then
-#         echo "${docker_tag} was previously downloaded to ${image_filename}, skipping..."
-#     else
-#         echo "Downloading ${docker_tag} from Docker Hub..."
-#         ${IMAGE_DOWNLOADER_LOCAL} ${image_cachedir} ${docker_tag}
-#         tar -czvf ${image_filename} -C ${image_cachedir} .
-#     fi
-# }
 
 download_docker_image() {
     image_name="$1"
@@ -223,17 +167,8 @@ copy_ssh_credentials() {
     fi
 }
 
-# copy_docker_credentials() {
-#     DOCKER_DIR=/home/${USER}/.docker
-#     if [ -d $DOCKER_DIR]; then
-#         echo "Writing $DOCKER_DIR to $TMP_ROOT_MOUNTPOINT/home/$USERNAME"
-#         mkdir -p $TMP_ROOT_MOUNTPOINT/home/$USERNAME
-#         cp -r $DOCKER_DIR $TMP_ROOT_MOUNTPOINT/home/$USERNAME/
-#     fi
-# }
-
 mount_disks() {
-    #wait 1 second for the /dev/disk/by-label to be refreshed
+    # wait 1 second for the /dev/disk/by-label to be refreshed
     sleep 1s
     TMP_ROOT_MOUNTPOINT="/media/$USER/root"
     TMP_HYPRIOT_MOUNTPOINT="/media/$USER/HypriotOS"
@@ -338,7 +273,6 @@ EOF
 # configs
 check_deps
 prompt_for_configs
-# install_deps
 
 # downloads
 download_etcher
@@ -352,7 +286,6 @@ flash_hypriot
 mount_disks
     preload_docker_images
     copy_ssh_credentials
-    # copy_docker_credentials
     write_configurations
     write_motd
     write_userdata
