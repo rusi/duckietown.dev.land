@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#for debutting, enable command printout
+#for debugging, enable command printout
 if [ -n "$DEBUG" ]; then
     set -x
 fi
@@ -15,12 +15,10 @@ if [ $(id -u) -eq "0" ]; then
     exit 1
 fi
 
-DEPS_LIST=(wget tar udisksctl docker) # lib32stdc++6 curl pv unzip hdparm sudo file udev golang-go jq)
+DEPS_LIST=(wget tar udisksctl docker base64) # lib32stdc++6 curl pv unzip hdparm sudo file udev golang-go jq)
 
 TMP_DIR="/tmp/duckietown"
 mkdir -p ${TMP_DIR}
-
-MOD_FILE="${TMP_DIR}/mod"
 
 ETCHER_URL="https://github.com/resin-io/etcher/releases/download/v1.4.4/etcher-cli-1.4.4-linux-x86.tar.gz"
 ETCHER_DIR="${TMP_DIR}/etcher-cli"
@@ -32,6 +30,7 @@ HYPRIOT_LOCAL="${TMP_DIR}/${HYPRIOT_URL##*/}"
 IMAGE_DOWNLOADER_CACHEDIR="${TMP_DIR}/docker_images"
 mkdir -p ${IMAGE_DOWNLOADER_CACHEDIR}
 
+MOD_FILE="${TMP_DIR}/mod"
 DUCKIE_ART_URL="https://raw.githubusercontent.com/duckietown/Software/master/misc/duckie.art"
 
 declare -A PRELOADED_DOCKER_IMAGES=( \
@@ -149,22 +148,15 @@ write_configurations() {
 write_motd() {
     # todo: check if the file on the server changed
     if [ ! -f $MOD_FILE ]; then
-        echo "Downloading Message Of the Day"
+        echo "Downloading Message of the Day"
         wget --no-check-certificate -O $MOD_FILE $DUCKIE_ART_URL
     fi
-    sudo cp $MOD_FILE $TMP_ROOT_MOUNTPOINT/etc/update-motd.d/duckie.art
-    printf '#!/bin/sh\nprintf "\\n$(cat /etc/update-motd.d/duckie.art)\\n"\n' | sudo tee -a $TMP_ROOT_MOUNTPOINT/etc/update-motd.d/20-duckie > /dev/null
-    sudo chmod +x $TMP_ROOT_MOUNTPOINT/etc/update-motd.d/20-duckie
+    DUCKIE_ART=$(cat $MOD_FILE | base64)
+    MOTD_CONTENTS=$(printf '#!/bin/sh\nprintf "\\n$(cat /etc/update-motd.d/duckie.art)\\n"\n')
 }
 
-# todo - move this in the cloud-init payload
 copy_ssh_credentials() {
-    PUB_KEY=/home/${USER}/.ssh/id_rsa.pub
-    if [ -f $PUB_KEY ]; then
-        echo "Writing $PUB_KEY to $TMP_ROOT_MOUNTPOINT/home/$USERNAME/.ssh/authorized_keys"
-        sudo mkdir -p $TMP_ROOT_MOUNTPOINT/home/$USERNAME/.ssh
-        cat $PUB_KEY | sudo tee -a $TMP_ROOT_MOUNTPOINT/home/$USERNAME/.ssh/authorized_keys > /dev/null
-    fi
+    PUB_KEY=$(cat /home/${USER}/.ssh/id_rsa.pub)
 }
 
 mount_disks() {
@@ -213,6 +205,14 @@ write_files:
       wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
       iface default inet dhcp
     path: /etc/network/interfaces.d/wlan0
+  - encoding: b64 
+    content: $DUCKIE_ART
+    path: /etc/update-motd.d/duckie.art
+  - content: $MOTD_CONTENTS
+    path: /etc/update-motd.d/20-duckie
+    permissions: '0755'
+  - content: $PUB_KEY
+    path: /home/$USERNAME/.ssh/authorized_keys
   - content: |
       country=CA
       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
@@ -267,7 +267,6 @@ EOF
 )
     echo "$USER_DATA" > $TMP_HYPRIOT_MOUNTPOINT/user-data
 }
-
 
 # main()
 
