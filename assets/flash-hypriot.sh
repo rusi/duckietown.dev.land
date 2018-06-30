@@ -254,14 +254,13 @@ runcmd:
   - [ systemctl, enable, docker-tcp.socket ]
   - [ systemctl, start, --no-block, docker-tcp.socket ]
   - [ systemctl, start, --no-block, docker ]
-  - [ docker, swarm, init ]
   - [ docker, load, "--input", "/var/local/portainer.tar.gz" ]
 # Disabled pre-loading duckietown/software due to insuffient space on /var/local
 # https://github.com/hypriot/image-builder-rpi/issues/244#issuecomment-390512469
 #  - [ docker, load, "--input", "/var/local/software.tar.gz"]
 
 # for convenience, we will install and start Portainer.io
-  - 'docker service create --detach=false --name portainer --quiet --no-resolve-image --publish published=9000,target=9000,mode=host --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer:linux-arm -H unix:///var/run/docker.sock --no-auth'
+  - 'docker run -d --restart always --name portainer -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer:linux-arm -H unix:///var/run/docker.sock --no-auth'
 
 EOF
 )
