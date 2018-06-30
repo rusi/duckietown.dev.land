@@ -101,7 +101,7 @@ download_hypriot() {
 
 flash_hypriot() {
     echo "Flashing Hypriot image $HYPRIOT_LOCAL to disk..."
-    sudo -p "[sudo] Enter password for '%p' which is required to run Etcher: " \
+    sudo -k -p "[sudo] Enter password for '%p' which is required to run Etcher: " \
         ${ETCHER_DIR}/etcher -u false ${HYPRIOT_LOCAL}
     echo "Flashing Hypriot image succeeded."
 }
@@ -135,8 +135,11 @@ preload_docker_images() {
     for image_name in "${!PRELOADED_DOCKER_IMAGES[@]}"; do
         docker_tag=${PRELOADED_DOCKER_IMAGES[$image_name]}
         image_filename="${IMAGE_DOWNLOADER_CACHEDIR}/${image_name}.tar.gz"
-        sudo cp ${image_filename} $TMP_ROOT_MOUNTPOINT/var/local/
+        # TODO: find a way to pre-load docker containers without needing SUDO access
+        sudo -p "[sudo] Enter password for '%p' which is required to pre-load docker containers: " \
+            cp ${image_filename} $TMP_ROOT_MOUNTPOINT/var/local/
     done
+    sudo -K # forget any cached sudo credentials
 }
 
 write_configurations() {
