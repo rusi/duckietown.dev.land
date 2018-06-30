@@ -38,6 +38,30 @@ declare -A PRELOADED_DOCKER_IMAGES=( \
     # ["duckietown"]="duckietown/software:latest" \
 )
 
+read_password() {
+    # thanks: https://stackoverflow.com/questions/1923435/how-do-i-echo-stars-when-reading-password-with-read
+    # unset password
+    password=""
+    prompt=$1
+    while IFS= read -p "$prompt" -r -s -n 1 char
+    do
+        if [[ $char == $'\0' ]]; then
+            break
+        fi
+        # thanks: https://askubuntu.com/questions/299437/how-can-i-use-the-backspace-character-as-a-backspace-when-entering-a-password
+        if [[ $char == $'\177' ]];  then
+            prompt=$'\b \b'
+            password="${password%?}"
+        else
+            prompt='*'
+            password+="$char"
+        fi
+    done
+    echo
+    # thanks: https://stackoverflow.com/questions/3236871/how-to-return-a-string-value-from-a-bash-function
+    eval "$2='$password'"
+}
+
 prompt_for_configs() {
     echo "Configuring DuckiebotOS (press ^C to cancel)..."
     
@@ -49,13 +73,13 @@ prompt_for_configs() {
     
     read -p "Please enter a username (default is $DEFAULT_USERNAME) > " USERNAME
     USERNAME=${USERNAME:-$DEFAULT_USERNAME}
-    read -p "Please enter a password (default is $DEFAULT_PASSWORD) > " PASSWORD
+    read_password "Please enter a password (default is $DEFAULT_PASSWORD) > " PASSWORD
     PASSWORD=${PASSWORD:-$DEFAULT_PASSWORD}
     read -p "Please enter a hostname (default is $DEFAULT_HOSTNAME) > " HOST_NAME
     HOST_NAME=${HOST_NAME:-$DEFAULT_HOSTNAME}
     read -p "Please enter a WIFI SSID (default is $DEFAULT_WIFISSID) > " WIFISSID
     WIFISSID=${WIFISSID:-$DEFAULT_WIFISSID}
-    read -p "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPASS
+    read_password "Please enter a WIFI PSK (default is $DEFAULT_WIFIPASS) > " WIFIPASS
     WIFIPASS=${WIFIPASS:-$DEFAULT_WIFIPASS}
 }
 
