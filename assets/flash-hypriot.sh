@@ -178,8 +178,7 @@ write_motd() {
         echo "Downloading Message of the Day"
         wget --no-check-certificate -O $MOD_FILE $DUCKIE_ART_URL
     fi
-    DUCKIE_ART=$(cat $MOD_FILE | base64)
-    MOTD_CONTENTS=$(printf '#!/bin/sh\nprintf "\\n$(cat /etc/update-motd.d/duckie.art)\\n"\n')
+    DUCKIE_ART=$(cat $MOD_FILE | base64 -w 0)
 }
 
 copy_ssh_credentials() {
@@ -235,7 +234,9 @@ write_files:
   - encoding: b64 
     content: $DUCKIE_ART
     path: /etc/update-motd.d/duckie.art
-  - content: $MOTD_CONTENTS
+  - content: |
+      #!/bin/sh
+      printf "\n$(cat /etc/update-motd.d/duckie.art)\n"
     path: /etc/update-motd.d/20-duckie
     permissions: '0755'
   - content: $PUB_KEY
