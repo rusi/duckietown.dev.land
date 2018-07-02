@@ -170,7 +170,8 @@ write_configurations() {
     _cfg="$TMP_HYPRIOT_MOUNTPOINT/config.txt"
     # Add i2c to boot configuration
     sed $_cfg -i -e "s/^start_x=0/start_x=1/"
-    sed $_cfg -i -e "s/^gpu_mem=16/gpu_mem=256/"
+    # do not reserve a lot of memory of the GPU, as the line following demo needs about 750-800M!!!
+    # sed $_cfg -i -e "s/^gpu_mem=16/gpu_mem=256/"
     echo "dtparam=i2c1=on" >> $_cfg
     echo "dtparam=i2c_arm=on" >> $_cfg
 }
